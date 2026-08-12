@@ -1,0 +1,49 @@
+# Legacy prototypes (local only — not part of v1.1 skeleton)
+ScriptSyncPython/
+ScriptSync_PySide6/
+MFlow_Analysis.md
+MFlow_UI_Design_Analysis.md
+
+# Electron / Workflow Integration binary (removed from v1)
+*.node
+
+# Commit helper (never commit)
+commit_msg.txt
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+.venv/
+env/
+*.egg-info/
+dist/
+build/
+*.egg
+
+# IDE / OS
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs & local data (never commit user sessions)
+*.log
+.sscriptsync_v1/
+sscriptsync_v1_path.txt
+python_path.txt
+
+# Install artifacts (generated locally)
+ScriptSync/scripts/sscriptsync_v1_path.txt
+
+# Cursor (optional — keep .cursorrules in repo)
+.cursor/
+
+# Windows
+*.exe
+*.dll
