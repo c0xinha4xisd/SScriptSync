@@ -6,9 +6,11 @@ Checklist para validar no **DaVinci Resolve Studio 21**.
 
 ## 1. Instalação
 
+Ver **[docs/INSTALL.md](./INSTALL.md)** se `python` não for encontrado (PC novo).
+
 ```powershell
-cd C:\Users\victv\Plugins\SScriptSync\ScriptSync
-python install.py
+cd SScriptSync\ScriptSync
+.\install.bat
 ```
 
 Confirme:

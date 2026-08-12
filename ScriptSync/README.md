@@ -26,10 +26,25 @@ Ver **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** para mapa completo do códi
 
 ## Instalação
 
+### Pré-requisito: Python 3.9+
+
+Se `python install.py` falha com *"não pode encontrar python.exe"* → **instale Python primeiro:**
+
+1. [python.org/downloads](https://www.python.org/downloads/) — Python **3.11** ou **3.12**
+2. Marque **Add python.exe to PATH** e **Install py launcher**
+3. Feche e reabra o PowerShell
+
+Guia completo: **[docs/INSTALL.md](docs/INSTALL.md)**
+
+### Instalar SScriptSync
+
 ```powershell
-cd C:\Users\victv\Plugins\SScriptSync\ScriptSync
-python install.py
+git clone https://github.com/c0xinha4xisd/SScriptSync.git
+cd SScriptSync\ScriptSync
+.\install.bat
 ```
+
+Alternativas: `py -3 install.py` ou `python install.py`
 
 Instala em: `%LOCALAPPDATA%\SScriptSync_v1\`
 

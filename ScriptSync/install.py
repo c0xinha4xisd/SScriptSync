@@ -109,20 +109,32 @@ def find_all_pythons():
     add(sys.executable)
     add("python3" if PLAT != "Windows" else "python")
     
-    # Windows common paths
+    # Windows: py launcher + common paths
     if PLAT == "Windows":
+        try:
+            r = subprocess.run(
+                ["py", "-3", "-c", "import sys; print(sys.version.split()[0]); print(sys.executable)"],
+                capture_output=True, text=True, timeout=10,
+                creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
+            )
+            if r.returncode == 0:
+                lines = r.stdout.strip().splitlines()
+                if len(lines) >= 2:
+                    add(lines[1])
+        except Exception:
+            pass
+
         la = os.environ.get("LOCALAPPDATA", "")
         if la:
-            for ver in ["312", "311", "310", "39"]:
+            for ver in ["313", "312", "311", "310", "39"]:
                 add(os.path.join(la, "Programs", "Python", f"Python{ver}", "python.exe"))
                 add(os.path.join(la, "Programs", "Python", f"Python{ver}", "pythonw.exe"))
-        
-        # Program Files
+
         pf = os.environ.get("PROGRAMFILES", "")
         if pf:
-            for ver in ["312", "311", "310", "39"]:
-                add(os.path.join(pf, "Python3{ver}", "python.exe"))
-                add(os.path.join(pf, "Python3{ver}", "pythonw.exe"))
+            for ver in ["313", "312", "311", "310", "39"]:
+                add(os.path.join(pf, f"Python{ver}", "python.exe"))
+                add(os.path.join(pf, f"Python{ver}", "pythonw.exe"))
     
     # PATH
     for p in os.environ.get("PATH", "").split(os.pathsep):
@@ -273,7 +285,17 @@ def main():
     
     if not pythons:
         log("ERROR: No compatible Python found (3.9+ required)", "ERROR")
-        log("Please install Python 3.9 or higher from python.org", "ERROR")
+        print()
+        if PLAT == "Windows":
+            log("Python is NOT installed or not on PATH on this PC.", "ERROR")
+            log("Fix:", "INFO")
+            log("  1. Download: https://www.python.org/downloads/", "INFO")
+            log('  2. Run installer — check "Add python.exe to PATH"', "INFO")
+            log('  3. Check "Install py launcher"', "INFO")
+            log("  4. Close PowerShell, open again, run: install.bat", "INFO")
+            log("     (or: py -3 install.py)", "INFO")
+        else:
+            log("Install Python 3.9+ (python3) then run: python3 install.py", "ERROR")
         return
     
     log(f"Found {len(pythons)} Python installation(s)", "PYTHON")

@@ -8,12 +8,18 @@
 
 ---
 
-## Quick start
+## Instalação (primeiro PC)
+
+**Requisito:** Python 3.9+ — se `python` não funciona, instale em [python.org](https://www.python.org/downloads/)  
+(marque **Add python.exe to PATH**).
 
 ```powershell
-cd ScriptSync
-python install.py
+git clone https://github.com/c0xinha4xisd/SScriptSync.git
+cd SScriptSync\ScriptSync
+.\install.bat
 ```
+
+Ou: `py -3 install.py` · Guia completo: **[ScriptSync/docs/INSTALL.md](ScriptSync/docs/INSTALL.md)**
 
 In Resolve Studio: **Workspace → Scripts → SScriptSync_v1**
 
