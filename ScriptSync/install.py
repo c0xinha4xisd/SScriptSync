@@ -158,6 +158,10 @@ def install_files():
         "main.py",
         "ui/backend.py",
         "ui/app.html",
+        "ui/v2-theme.css",
+        "ui/v0-theme.css",
+        "ui/v3-theme.css",
+        "ui/design-v3.json",
         "scripts/SScriptSync_v1.lua",
         "scripts/SScriptSync_v1_Free.py",
     ]

@@ -1184,6 +1184,32 @@ class Backend(QObject):
         self._persist_session()
         self._save_sidecar_if_path()
 
+    @Slot(int, str)
+    def set_sync_node_label(self, index: int, label: str):
+        """Custom display label for the sync node / primary clip link on a line."""
+        if index < 0 or index >= len(self._parsed_lines):
+            return
+        from core.link_model import get_line_links, set_line_links
+
+        line = self._parsed_lines[index]
+        links = get_line_links(line)
+        if not links:
+            return
+        primary = next((l for l in links if l.get("link_type") == "clip"), links[0])
+        text = label.strip()
+        if text:
+            primary["link_label"] = text
+        else:
+            primary.pop("link_label", None)
+        set_line_links(line, links)
+        self._emit_lines()
+        self._persist_session()
+        self._save_sidecar_if_path()
+        self.status_changed.emit(
+            f"Sync renomeado: {text or primary.get('clip_name', 'Clip')[:32]}",
+            "#9ccfd8",
+        )
+
     @Slot(str)
     def export_bundle(self, content: str = ""):
         if not self._parsed_lines:

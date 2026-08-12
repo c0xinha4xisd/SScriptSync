@@ -198,7 +198,7 @@ class SScriptSyncWindow(QMainWindow):
         self.setWindowTitle("SScriptSync v1 - DaVinci Resolve Text Editor")
         self.setMinimumSize(1000, 700)
         self.resize(1200, 800)
-        self.setStyleSheet("QMainWindow { background-color: #0e0e12; }")
+        self.setStyleSheet("QMainWindow { background-color: #070709; }")
         self.setWindowFlag(Qt.WindowType.Window, True)
         self.setAttribute(Qt.WidgetAttribute.WA_ShowWithoutActivating, False)
 
@@ -215,7 +215,7 @@ class SScriptSyncWindow(QMainWindow):
         settings.setAttribute(QWebEngineSettings.WebGLEnabled, False)
         settings.setAttribute(QWebEngineSettings.PluginsEnabled, False)
 
-        self.webview.page().setBackgroundColor(QColor("#0e0e12"))
+        self.webview.page().setBackgroundColor(QColor("#070709"))
 
         self.channel = QWebChannel()
         from ui.backend import Backend

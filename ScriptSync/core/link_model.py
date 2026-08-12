@@ -10,6 +10,7 @@ _LINK_KEYS = (
     "link_id",
     "link_type",
     "link_color",
+    "link_label",
     "clip_uid",
     "clip_index",
     "clip_name",

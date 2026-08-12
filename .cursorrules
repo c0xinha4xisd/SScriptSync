@@ -110,6 +110,11 @@ If needed, you can further use the `web_scraper.py` file to scrape the web page 
 
 # Scratchpad
 
+## Task: v3 UI v1.2.0 — DONE (Aug 2026)
+[X] UI v0 port, link fixes, spine labels, inline take cards
+[X] Docs standalone vs Resolve
+[X] Git commit + push GitHub
+
 ## Task: GitHub skeleton backup v1.1.0 (Aug 2026)
 [X] Remove legacy Electron + resolve_async
 [X] Docs: ARCHITECTURE, CHANGELOG, KNOWN_ISSUES, LICENSE, README

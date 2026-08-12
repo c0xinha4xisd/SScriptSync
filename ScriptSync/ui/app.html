@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <script src="qrc:///qtwebchannel/qwebchannel.js"></script>
-<title>SScriptSync v1</title>
+<title>SScriptSync v3</title>
 <style>
 @font-face{font-family:'Monaspace';src:url('Monaspace_Neon_Var.woff2') format('woff2');font-weight:100 900;font-style:normal}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -349,158 +349,142 @@ body.link-mode .script-line{cursor:pointer}
   border:1px solid color-mix(in srgb,var(--accent),transparent 40%);background:var(--accent);color:var(--base);font-family:inherit}
 .intro-gotit:hover{filter:brightness(1.06)}
 </style>
+<link rel="stylesheet" href="v0-theme.css">
 </head>
 <body>
 <div id="root">
-  <!-- Titlebar -->
-  <div id="titlebar">
-    <div id="appname"><span id="ss">SS</span><span id="ync">criptSync v1</span></div>
-    <span class="badge">v1.1</span>
-    <span id="version">Studio Edition</span>
-    <div class="spacer"></div>
-    <div id="conn-row">
-      <div id="conn-dot"></div>
-      <span id="conn-text">Connecting...</span>
+  <header id="v0-topbar">
+    <div id="v0-brand">
+      <span id="v0-brand-name">SCRIPT+SYNC</span>
+      <span id="v0-brand-ver">v3.0</span>
     </div>
-    <button type="button" id="help-btn" class="titlebar-btn" onclick="openIntro(true)" title="Referência rápida (F1)">?</button>
-  </div>
-
-  <!-- Toolbar -->
-  <div id="toolbar">
-    <div class="toolbar-scroll">
-    <button id="link-mode-btn" class="mode-btn primary" onclick="toggleLinkMode()" title="Link manual estilo AVID">Link</button>
-    <button class="mode-btn primary resync-btn" onclick="resyncTimeline()" title="Re-lê clipes da timeline">Re-sync</button>
-    <button class="mode-btn primary" onclick="syncTimeline(); closeAllMenus()" title="Auto-sync (linhas elegíveis)">Auto Sync</button>
-
-    <div class="tb-menu" id="menu-file">
-      <button type="button" class="menu-trigger" onclick="toggleMenu('menu-file', event)">Arquivo</button>
-      <div class="menu-list" onclick="event.stopPropagation()">
-        <button type="button" onclick="newScript(); closeAllMenus()">Novo roteiro</button>
-        <button type="button" onclick="importScript(); closeAllMenus()">Importar…</button>
-        <button type="button" onclick="saveScript(); closeAllMenus()">Salvar</button>
-        <button type="button" onclick="exportBundle(); closeAllMenus()">Exportar (.txt + sidecar + EDL)</button>
-        <div class="menu-sep"></div>
-        <button type="button" onclick="addLine(); closeAllMenus()">+ Linha</button>
-        <button type="button" class="danger" onclick="clearEditor(); closeAllMenus()">Limpar editor</button>
+    <nav id="v0-nav">
+      <button type="button" class="v0-nav-btn" onclick="syncTimeline(); closeAllMenus()" title="F3">
+        <span aria-hidden="true">⟳</span> F3-Auto Sync
+      </button>
+      <div class="tb-menu" id="menu-scenes">
+        <button type="button" class="v0-nav-btn menu-trigger" onclick="toggleMenu('menu-scenes', event)">
+          <span aria-hidden="true">☰</span> Scenes
+        </button>
+        <div class="menu-list" onclick="event.stopPropagation()">
+          <select id="scene-select" style="width:100%;margin:4px 0;display:block" onchange="goToScene(this.value); closeAllMenus()">
+            <option value="">Todas as cenas</option>
+          </select>
+          <select id="page-select" style="width:100%;margin:4px 0;display:block" onchange="goToPage(this.value); closeAllMenus()">
+            <option value="">Página</option>
+          </select>
+          <div class="menu-sep"></div>
+          <button type="button" onclick="prevScene(); closeAllMenus()">◀ Cena anterior</button>
+          <button type="button" onclick="nextScene(); closeAllMenus()">Próxima cena ▶</button>
+        </div>
       </div>
-    </div>
-
-    <div class="tb-menu" id="menu-link">
-      <button type="button" class="menu-trigger" onclick="toggleMenu('menu-link', event)">Link</button>
-      <div class="menu-list" onclick="event.stopPropagation()">
-        <button type="button" onclick="linkToPlayhead(); closeAllMenus()">Marker no playhead</button>
-        <button type="button" onclick="unlinkSelected(); closeAllMenus()">Unlink seleção</button>
-        <div class="menu-sep"></div>
-        <button type="button" onclick="undoLink(); closeAllMenus()">Desfazer</button>
-        <button type="button" onclick="redoLink(); closeAllMenus()">Refazer</button>
+      <button type="button" class="v0-nav-btn" onclick="importScript(); closeAllMenus()"><span aria-hidden="true">↓</span> Import</button>
+      <button type="button" class="v0-nav-btn" onclick="exportBundle(); closeAllMenus()"><span aria-hidden="true">↑</span> Export</button>
+      <div id="v0-top-progress" title="Progresso"><div id="v0-top-progress-fill"></div></div>
+      <div class="tb-menu" id="menu-more">
+        <button type="button" class="v0-nav-btn menu-trigger" onclick="toggleMenu('menu-more', event)">⋯</button>
+        <div class="menu-list" onclick="event.stopPropagation()">
+          <button type="button" onclick="newScript(); closeAllMenus()">Novo roteiro</button>
+          <button type="button" onclick="saveScript(); closeAllMenus()">Salvar</button>
+          <div class="menu-sep"></div>
+          <button type="button" id="link-mode-btn" onclick="toggleLinkMode(); closeAllMenus()">Link manual</button>
+          <button type="button" onclick="resyncTimeline(); closeAllMenus()">Re-sync timeline</button>
+          <button type="button" onclick="linkToPlayhead(); closeAllMenus()">Marker no playhead</button>
+          <button type="button" onclick="unlinkSelected(); closeAllMenus()">Unlink seleção</button>
+          <div class="menu-sep"></div>
+          <button type="button" onclick="syncBetweenMarks(); closeAllMenus()">Range sync</button>
+          <button type="button" onclick="importSrtMap(); closeAllMenus()">Importar SRT</button>
+          <button type="button" onclick="undoLink(); closeAllMenus()">Desfazer link</button>
+          <button type="button" onclick="redoLink(); closeAllMenus()">Refazer link</button>
+          <button type="button" onclick="toggleTimelinePanel(); closeAllMenus()">Mostrar/ocultar mídias</button>
+          <div class="menu-sep"></div>
+          <input type="search" id="find-input-visible" class="menu-find-input" placeholder="Buscar no roteiro…" oninput="syncScriptFind(this.value)">
+          <label class="menu-check"><input type="checkbox" id="opt-skip-caps" checked> Ignorar CAPS</label>
+          <label class="menu-check"><input type="checkbox" id="opt-skip-parens" checked> Ignorar ()</label>
+          <label class="menu-check"><input type="checkbox" id="opt-skip-scenes" checked> Ignorar cenas</label>
+          <select id="sync-mode-select" style="display:none"><option value="linear">Linear</option><option value="clips">By Clips</option></select>
+        </div>
       </div>
-    </div>
+      <div id="v0-conn"><div id="conn-dot"></div><span id="conn-text">Connecting…</span></div>
+      <button type="button" id="help-btn" onclick="openIntro(true)" title="F1">?</button>
+    </nav>
+  </header>
 
-    <div class="tb-menu" id="menu-sync">
-      <button type="button" class="menu-trigger" onclick="toggleMenu('menu-sync', event)">Sync</button>
-      <div class="menu-list" onclick="event.stopPropagation()">
-        <div class="menu-label">Modo auto-sync</div>
-        <button type="button" data-sync-mode="linear"
-          onclick="document.getElementById('sync-mode-select').value='linear'; updateSyncMenuChecks(); closeAllMenus()">Linear (timeline inteira)</button>
-        <button type="button" data-sync-mode="clips"
-          onclick="document.getElementById('sync-mode-select').value='clips'; updateSyncMenuChecks(); closeAllMenus()">By Clips (por duração)</button>
-        <select id="sync-mode-select" class="toolbar-select" style="display:none"><option value="linear">Linear</option><option value="clips">By Clips</option></select>
-        <div class="menu-sep"></div>
-        <div class="menu-label">Filtros auto-sync</div>
-        <label class="menu-check"><input type="checkbox" id="opt-skip-caps" checked> Ignorar CAPS (personagem)</label>
-        <label class="menu-check"><input type="checkbox" id="opt-skip-parens" checked> Ignorar () parentéticos</label>
-        <label class="menu-check"><input type="checkbox" id="opt-skip-scenes" checked> Ignorar cabeçalhos cena</label>
-        <div class="menu-sep"></div>
-        <button type="button" onclick="syncBetweenMarks(); closeAllMenus()">Range (first ↔ last mark)</button>
-        <button type="button" onclick="importSrtMap(); closeAllMenus()">Importar SRT / Rev…</button>
-      </div>
-    </div>
-
-    <div class="tb-group" style="border-right:none;padding-left:2px">
-      <select id="scene-select" class="nav-select" title="Cena" onchange="goToScene(this.value)">
-        <option value="">Scene</option>
-      </select>
-      <select id="page-select" class="nav-select" title="Página" onchange="goToPage(this.value)">
-        <option value="">Page</option>
-      </select>
-      <button class="mode-btn" onclick="prevScene()" title="Cena anterior">◀</button>
-      <button class="mode-btn" onclick="nextScene()" title="Próxima cena">▶</button>
-    </div>
-
-    <div class="tb-spacer"></div>
-    <span id="sync-badge">NOT SYNCED</span>
-    <input type="search" id="find-input" placeholder="Buscar…" oninput="applyFindFilter()">
-    <span id="project-label">Untitled</span>
-    </div>
-  </div>
-
-  <!-- Main Content -->
   <div id="main">
-    <svg id="link-svg" aria-hidden="true"></svg>
-
-    <!-- Timeline Info Panel -->
-    <div id="timeline-panel">
-      <div id="timeline-hdr">TIMELINE</div>
+    <aside id="timeline-panel">
+      <div class="v0-media-hdr">Mídias</div>
       <div id="timeline-content">
-        <div id="current-tc">--:--:--:--</div>
-        <div class="info-row">
-          <span class="info-label">Name:</span>
-          <span class="info-value" id="timeline-name">--</span>
-        </div>
-        <div class="info-row">
-          <span class="info-label">FPS:</span>
-          <span class="info-value" id="timeline-fps">--</span>
-        </div>
-        <div class="info-row">
-          <span class="info-label">Duration:</span>
-          <span class="info-value" id="timeline-duration">--</span>
-        </div>
-        <div class="info-row">
-          <span class="info-label">Lines:</span>
-          <span class="info-value" id="line-count">0</span>
-        </div>
         <div id="clips-section">
-          <div id="clips-hdr-row">
-            <div>
-              <div id="clips-hdr">CLIPS</div>
-              <div id="clips-sub">Vídeo + áudio</div>
-            </div>
-          </div>
           <div id="clips-toolbar">
-            <div class="clips-toolbar-row">
-              <input type="search" id="clip-find-input" placeholder="Buscar clipe…" oninput="applyClipFindFilter()">
-              <button type="button" class="clip-refresh resync-btn" onclick="resyncTimeline()" title="Re-sync timeline">↻</button>
-            </div>
-            <div class="clip-type-filters">
-              <button type="button" class="clip-type-btn on" data-clip-filter="all" onclick="setClipFilter('all')">Todos</button>
-              <button type="button" class="clip-type-btn" data-clip-filter="video" onclick="setClipFilter('video')">V</button>
-              <button type="button" class="clip-type-btn" data-clip-filter="audio" onclick="setClipFilter('audio')">A</button>
-            </div>
+            <input type="search" id="clip-find-input" placeholder="Buscar mídia…" oninput="applyClipFindFilter()">
           </div>
-          <div id="clips-list">
-            <div class="empty-state">No clips</div>
-          </div>
+          <div id="clips-list"><div class="empty-state">No clips</div></div>
         </div>
       </div>
-    </div>
+    </aside>
 
-    <!-- Editor + Sync -->
-    <div id="editor-panel">
-      <div id="editor-container">
-        <div id="sync-thumbs-row"></div>
-        <div id="editor-body">
-          <div id="playhead-band" aria-hidden="true"></div>
-          <div id="lines-container">
-            <div class="placeholder">New ou Import → Link Mode → select lines → click clip (links salvos em .ssync.json)</div>
+    <section id="workspace-v0">
+      <div class="v0-col-headers">
+        <span class="hdr-sync">Sync</span>
+        <span class="hdr-script">Roteiro</span>
+      </div>
+      <div id="workspace-body">
+        <svg id="workspace-svg" aria-hidden="true"></svg>
+        <svg id="link-svg" aria-hidden="true" style="display:none"></svg>
+        <div id="v0-drop-zone"><span>Solte no take</span></div>
+        <div class="v0-body-inner">
+          <div id="sync-lane">
+            <div class="v0-spine-line" aria-hidden="true"></div>
+            <div id="sync-nodes"></div>
           </div>
-          <div id="sync-panel">
-            <div id="sync-hdr">SYNC</div>
-            <div id="sync-tracks"></div>
+          <div id="v0-content">
+            <div id="take-cards-top" aria-hidden="true"></div>
+            <div id="v0-script-row">
+              <div id="lines-container" class="script-paper">
+                <div class="placeholder">Escreva o roteiro…</div>
+              </div>
+              <div id="script-minimap">
+                <div class="v0-minimap-gutter"><div class="v0-minimap-markers" id="minimap-markers"></div></div>
+                <div class="v0-minimap-ticks" id="minimap-ticks"></div>
+                <div id="minimap-viewport"></div>
+              </div>
+            </div>
+            <div id="take-cards-bottom"></div>
           </div>
         </div>
       </div>
-    </div>
+    </section>
   </div>
+
+  <div id="timeline-meta-hidden" aria-hidden="true">
+    <span id="sync-badge">NOT SYNCED</span>
+    <span id="clips-sub"></span>
+    <span id="timeline-name">--</span>
+    <span id="timeline-fps">--</span>
+    <span id="timeline-duration">--</span>
+    <span id="line-count">0</span>
+    <span id="video-tc">--:--:--:--</span>
+    <span id="project-label">Untitled</span>
+    <input type="search" id="find-input" oninput="applyFindFilter()">
+    <div id="spine-nodes"></div>
+    <div id="lines-gutter-inner"></div>
+  </div>
+
+  <footer id="decup-footer">
+    <div class="v0-footer-left">
+      <button type="button" class="footer-btn" onclick="linkToPlayhead()">Sincronizar Manualmente (F5)</button>
+      <button type="button" class="footer-btn" onclick="nextScene()">Próxima Cena</button>
+    </div>
+    <span id="footer-status" class="footer-status">Pronto para decupagem</span>
+    <div class="v0-footer-right">
+      <div class="footer-progress-wrap">
+        <div class="footer-progress-bar"><div id="footer-progress-fill" class="footer-progress-fill"></div></div>
+        <span id="footer-progress-pct" class="footer-progress-pct">0%</span>
+      </div>
+      <button type="button" class="footer-btn" onclick="tapSyncAdvance()">Avançar Script</button>
+      <button type="button" class="footer-btn primary" onclick="exportBundle(); closeAllMenus()">Finalizar Decupagem</button>
+    </div>
+  </footer>
 
   <!-- Status Bar -->
   <div id="status-bar">
@@ -512,16 +496,20 @@ body.link-mode .script-line{cursor:pointer}
 <div id="intro-overlay" class="intro-overlay hidden" aria-hidden="true">
   <div class="intro-modal" role="dialog" aria-labelledby="intro-title">
     <header class="intro-hdr">
-      <div id="intro-title" class="intro-brand"><span>SS</span>criptSync v1</div>
+      <div id="intro-title" class="intro-brand"><span>SS</span>criptSync v2</div>
       <span class="intro-sub">Referência rápida</span>
       <div class="intro-spacer"></div>
       <button type="button" class="intro-close" onclick="closeIntro()" title="Fechar (Esc)">×</button>
     </header>
+    <div class="intro-steps" id="intro-steps" role="tablist" aria-label="Passos"></div>
     <p class="intro-lead" id="intro-lead"></p>
-    <div class="intro-body" id="intro-body"></div>
+    <div class="intro-body intro-step-view" id="intro-body"></div>
     <footer class="intro-ftr">
       <label class="intro-skip"><input type="checkbox" id="intro-skip-cb"> Não mostrar ao iniciar</label>
-      <button type="button" class="intro-gotit" onclick="closeIntro()">ENTENDI</button>
+      <div class="intro-nav">
+        <button type="button" class="intro-nav-btn" id="intro-prev-btn" onclick="introStepPrev()">← Anterior</button>
+        <button type="button" class="intro-nav-btn primary" id="intro-next-btn" onclick="introStepNext()">Próximo →</button>
+      </div>
     </footer>
   </div>
 </div>
@@ -565,6 +553,406 @@ const LINE_BAR_INSET = 7;
 const CLIP_EDGE_OUTSET = 3;
 const SYNC_COL_W = 28;
 const INTRO_STORAGE_KEY = 'ssync_skip_intro';
+const CAM_COLORS = ['#ffc107', '#2196f3', '#4caf50', '#e91e63', '#9c27b0'];
+const GC_MAX_CHARS = 56;
+let pairedLineIndex = -1;
+let tapSyncPendingAdvance = false;
+let editingSyncNodeIndex = -1;
+
+function setTimecodeDisplay(tc) {
+  const v = tc || '--:--:--:--';
+  const videoTc = document.getElementById('video-tc');
+  if (videoTc) videoTc.textContent = v;
+}
+
+function cameraColorForClip(clip) {
+  if (!clip) return '#666';
+  if (clip.is_audio || clip.track_type === 'audio') return '#4caf50';
+  const label = (clip.track_label || 'V1').toUpperCase();
+  const n = parseInt(label.replace(/\D/g, ''), 10);
+  if (label.startsWith('V')) {
+    if (n === 1 || n % 3 === 1) return '#ffc107';
+    if (n === 2 || n % 3 === 2) return '#2196f3';
+    return '#4caf50';
+  }
+  return CAM_COLORS[(n || 0) % CAM_COLORS.length];
+}
+
+function camLabelForClip(clip) {
+  if (!clip) return '';
+  if (clip.is_audio || clip.track_type === 'audio') return 'Áudio';
+  const label = (clip.track_label || 'V1').toUpperCase();
+  const n = parseInt(label.replace(/\D/g, ''), 10) || 1;
+  return `Câm ${String.fromCharCode(64 + Math.min(n, 26))}`;
+}
+
+function clipDisplayName(clip, link) {
+  const raw = (link?.link_label || clip?.name || link?.clip_name || '').trim();
+  if (!raw) return '';
+  return raw.replace(/\.[^.]+$/, '');
+}
+
+function syncNodeLabel(line, clip, link) {
+  if (link?.link_label) return truncateLabel(link.link_label, 16);
+  const name = clipDisplayName(clip, link);
+  if (name) return truncateLabel(name, 16);
+  if (link?.track_label) return truncateLabel(link.track_label, 12);
+  if (clip) return truncateLabel(camLabelForClip(clip), 10);
+  if (line && getLineLinks(line).length) return 'Sync';
+  return '—';
+}
+
+function syncNodeFullTitle(line, clip, link) {
+  if (link?.link_label) return link.link_label;
+  const name = clipDisplayName(clip, link);
+  if (name) return name;
+  if (clip?.name) return clip.name;
+  if (link?.clip_name) return link.clip_name;
+  return syncNodeLabel(line, clip, link);
+}
+
+function clipDurationLabel(clip) {
+  if (!clip) return '';
+  if (clip.duration_tc) return clip.duration_tc;
+  if (clip.start_frame != null && clip.end_frame != null) {
+    const frames = Math.max(0, clip.end_frame - clip.start_frame);
+    const fps = 24;
+    const sec = Math.round(frames / fps);
+    if (sec < 60) return `${sec}s`;
+    return `${Math.floor(sec / 60)} min`;
+  }
+  return '';
+}
+
+function classifyScriptLine(text, prevType = '') {
+  const t = (text || '').trim();
+  if (!t) return 'action';
+  if (/^(GC|CG)[\s:]/i.test(t) || t.startsWith('<<')) return 'gc';
+  if (/^(CENA\s*\d|INT\.|EXT\.|INT\/EXT)/i.test(t) || /^CENA \d+/i.test(t)) return 'scene_heading';
+  if (/^[A-ZÀ-Ú][A-ZÀ-Ú0-9\s.\-'']+$/.test(t.replace(/:$/, '')) && t.endsWith(':') && t.length < 42) return 'character';
+  if (prevType === 'character') return 'dialogue';
+  if (t === t.toUpperCase() && t.length > 8 && !t.includes(':')) return 'scene_heading';
+  return 'action';
+}
+
+function sceneLabelForClip(clip, index = 0) {
+  const m = (clip?.name || '').match(/CENA\s*\d+/i);
+  if (m) return m[0].toUpperCase().replace(/cena/i, 'CENA');
+  return `CENA ${String(index + 1).padStart(2, '0')}`;
+}
+
+function takeDetailsForClip(clip) {
+  if (!clip) return '';
+  const fps = document.getElementById('timeline-fps')?.textContent?.replace(/\D/g, '') || '24';
+  const dur = clipDurationLabel(clip);
+  return `${fps} fps · ${dur || 'duração'}`;
+}
+
+function takeIdForClip(clip, index, link) {
+  if (link?.link_label) return truncateLabel(link.link_label, 18);
+  const name = (clip?.name || link?.clip_name || '').trim();
+  if (name) return truncateLabel(name.replace(/\.[^.]+$/, ''), 18);
+  if (!clip) return `Take ${index + 1}`;
+  const cam = camLabelForClip(clip).replace('âm ', '');
+  return `TAKE ${cam}-${index + 1}`;
+}
+
+function renderSpineBottomTakes() {
+  renderTakeCards();
+}
+
+function getLineCoverageColors(line) {
+  const colors = [];
+  getLineLinks(line).forEach(link => {
+    const clip = timelineClips.find(c => linkMatchesClip(link, c));
+    const c = link.link_color || (clip ? cameraColorForClip(clip) : '');
+    if (c && !colors.includes(c)) colors.push(c);
+  });
+  if (!colors.length && (line.link_color || line.start_tc)) {
+    colors.push(line.link_color || '#2196f3');
+  }
+  return colors;
+}
+
+function pairLineWithSpine(index, on = true) {
+  pairedLineIndex = on ? index : -1;
+  document.querySelectorAll('.sync-node-v0').forEach(n => {
+    n.classList.toggle('active', on && parseInt(n.dataset.lineIndex, 10) === index);
+  });
+  document.querySelectorAll('.script-line').forEach(el => {
+    el.classList.toggle('sync-paired', on && parseInt(el.dataset.index, 10) === index);
+  });
+  renderTakeCards();
+}
+
+function updateFooterProgress() {
+  const total = parsedLines.length || 1;
+  const synced = parsedLines.filter(l => getLineLinks(l).length || l.start_tc).length;
+  const pct = Math.round((synced / total) * 100);
+  const fill = document.getElementById('footer-progress-fill');
+  const topFill = document.getElementById('v0-top-progress-fill');
+  const pctEl = document.getElementById('footer-progress-pct');
+  if (fill) fill.style.width = `${pct}%`;
+  if (topFill) topFill.style.width = `${pct}%`;
+  if (pctEl) pctEl.textContent = `${pct}%`;
+}
+
+function colorClassForClip(clip) {
+  if (!clip || clip.is_audio || clip.track_type === 'audio') return 'green';
+  const label = (clip.track_label || 'V1').toUpperCase();
+  const n = parseInt(label.replace(/\D/g, ''), 10) || 1;
+  if (n === 1 || n % 3 === 1) return 'yellow';
+  if (n === 2 || n % 3 === 2) return 'blue';
+  return 'green';
+}
+
+function takeRowForLink(link, idx) {
+  const clip = timelineClips.find(c => linkMatchesClip(link, c));
+  const tkey = clip ? thumbKeyForClip(clip) : '';
+  const thumb = clip ? thumbHtml(clip, '#666', '') : '';
+  return {
+    title: takeIdForClip(clip, idx, link),
+    duration: clip ? clipDurationLabel(clip) : '',
+    meta: clip ? takeDetailsForClip(clip) : '',
+    thumbHtml: `<div class="spine-thumb-img${clip ? '' : ' empty'}" data-thumb-key="${tkey}">${thumb || ''}</div>`,
+    clip,
+    colorClass: colorClassForClip(clip),
+  };
+}
+
+function buildTakeCardHtml(rows, anchorId) {
+  const body = rows.map((row, i) => `
+    <div class="take-row-v0">
+      <div class="take-thumb-v0">${row.thumbHtml || ''}</div>
+      <div class="take-info-v0">
+        <div class="take-title-v0">${escapeHtml(row.title)}</div>
+        ${row.duration ? `<div class="take-dur-v0">${escapeHtml(row.duration)}</div>` : ''}
+        ${row.meta ? `<div class="take-meta-v0">${escapeHtml(row.meta)}</div>` : ''}
+      </div>
+    </div>`).join('');
+  return `<div class="take-card-v0"${anchorId ? ` data-anchor="${anchorId}"` : ''}>${body}</div>`;
+}
+
+function buildLineTakeSlotHtml(index, line, links) {
+  const clipLinks = links.filter(l => l.link_type === 'clip');
+  const isActive = index === activeLineIndex;
+  const isSelected = selectedLines.has(index);
+
+  if (linkMode && isSelected && !clipLinks.length) {
+    return `<div class="line-take-slot pending expanded" data-line-index="${index}">
+      <div class="take-card-v0 take-pending"><div class="take-title-v0">Clique ou arraste um clip</div></div>
+    </div>`;
+  }
+
+  if (!clipLinks.length) return '';
+
+  const rows = clipLinks.map((l, j) => takeRowForLink(l, index + j));
+  const stateCls = isActive ? ' expanded' : ' collapsed';
+  return `<div class="line-take-slot${stateCls}" data-line-index="${index}">${buildTakeCardHtml(rows, `take-line-${index}`)}</div>`;
+}
+
+function renderTakeCards() {
+  parsedLines.forEach((line, index) => {
+    const block = document.querySelector(`.script-block[data-index="${index}"]`);
+    if (!block) return;
+    const html = buildLineTakeSlotHtml(index, line, getLineLinks(line));
+    const prev = block.querySelector('.line-take-slot');
+    if (html) {
+      if (prev) prev.outerHTML = html;
+      else block.insertAdjacentHTML('afterbegin', html);
+    } else if (prev) {
+      prev.remove();
+    }
+  });
+  applyClipThumbnails();
+}
+
+const MINIMAP_TICK_PALETTE = ['#5b6472', '#3d3d44', '#4a9fe8', '#4a4a52', '#4ade80', '#f5b83d'];
+
+function renderMinimap() {
+  const ticksEl = document.getElementById('minimap-ticks');
+  const markersEl = document.getElementById('minimap-markers');
+  const body = document.getElementById('workspace-body');
+  if (!ticksEl) return;
+
+  const n = Math.max(parsedLines.length, 32);
+  ticksEl.innerHTML = '';
+  for (let i = 0; i < n; i++) {
+    const line = parsedLines[i];
+    const colors = line ? getLineCoverageColors(line) : [];
+    const c = colors[0] || MINIMAP_TICK_PALETTE[i % MINIMAP_TICK_PALETTE.length];
+    const w = 30 + ((i * 17) % 55);
+    const tick = document.createElement('div');
+    tick.className = 'v0-minimap-tick';
+    tick.style.width = `${w}%`;
+    tick.style.backgroundColor = c;
+    ticksEl.appendChild(tick);
+  }
+
+  if (markersEl) {
+    markersEl.innerHTML = '';
+    parsedLines.forEach((line, i) => {
+      const colors = getLineCoverageColors(line);
+      if (!colors.length) return;
+      const m = document.createElement('div');
+      m.className = 'v0-minimap-marker';
+      m.style.backgroundColor = colors[0];
+      m.style.top = `${16 + i * 6}px`;
+      markersEl.appendChild(m);
+    });
+  }
+  updateMinimapViewport();
+}
+
+function updateMinimapViewport() {
+  const body = document.getElementById('workspace-body');
+  const vp = document.getElementById('minimap-viewport');
+  const ticks = document.getElementById('minimap-ticks');
+  if (!body || !vp || !ticks) return;
+  const ratio = body.clientHeight / Math.max(body.scrollHeight, 1);
+  const h = Math.max(12, ticks.offsetHeight * ratio);
+  vp.style.height = `${h}px`;
+  vp.style.top = `${(body.scrollTop / Math.max(body.scrollHeight, 1)) * ticks.offsetHeight + 8}px`;
+}
+
+function computeWorkspacePaths() {
+  const svg = document.getElementById('workspace-svg');
+  const body = document.getElementById('workspace-body');
+  if (!svg || !body) return;
+
+  const base = body.getBoundingClientRect();
+  const ox = -base.left + body.scrollLeft;
+  const oy = -base.top + body.scrollTop;
+
+  const rectOf = id => {
+    const el = body.querySelector(`[data-anchor="${id}"]`);
+    return el ? el.getBoundingClientRect() : null;
+  };
+
+  const spine = document.getElementById('sync-lane');
+  const spineX = spine ? spine.getBoundingClientRect().left + ox + 60 : 60;
+
+  const paths = [];
+  const hi = getHighlightedLineSet();
+  const showIdx = idx => activeLineIndex < 0 || idx === activeLineIndex || hi.has(idx);
+
+  parsedLines.forEach((line, idx) => {
+    if (!showIdx(idx)) return;
+    const links = getLineLinks(line).filter(l => l.link_type === 'clip');
+    if (!links.length) return;
+    const target = rectOf(`take-line-${idx}`) || rectOf(`line-${idx}`);
+    const node = body.querySelector(`.sync-node-v0[data-line-index="${idx}"]`);
+    if (!target || !node) return;
+    const nr = node.getBoundingClientRect();
+    const sx = nr.right + ox;
+    const sy = nr.top + oy + nr.height / 2;
+    const ex = target.left + ox;
+    const ey = target.top + oy + target.height / 2;
+    const clip = timelineClips.find(c => linkMatchesClip(links[0], c));
+    const stroke = clip ? cameraColorForClip(clip) : '#5b6472';
+    const c1x = sx + (ex - sx) * 0.5;
+    const c2x = ex - (ex - sx) * 0.5;
+    if (Math.abs(sy - ey) < 8) {
+      paths.push({ d: `M ${sx} ${sy} L ${ex} ${ey}`, stroke });
+    } else {
+      paths.push({ d: `M ${sx} ${sy} C ${c1x} ${sy}, ${c2x} ${ey}, ${ex} ${ey}`, stroke });
+    }
+  });
+
+  const w = body.scrollWidth;
+  const h = body.scrollHeight;
+  svg.setAttribute('width', String(w));
+  svg.setAttribute('height', String(h));
+  svg.innerHTML = paths.map(p =>
+    `<path d="${p.d}" fill="none" stroke="${p.stroke}" stroke-width="2" stroke-linecap="round" opacity="0.85"/>`
+  ).join('');
+}
+
+function tapSyncAdvance() {
+  const idx = activeLineIndex >= 0 ? activeLineIndex : 0;
+  if (!parsedLines.length) return;
+  selectedLines.clear();
+  selectedLines.add(idx);
+  activeLineIndex = idx;
+  tapSyncPendingAdvance = true;
+  linkToPlayhead();
+  setFooterStatus(`Sync linha ${idx + 1}…`);
+}
+
+function setFooterStatus(msg) {
+  const el = document.getElementById('footer-status');
+  if (el) el.textContent = msg;
+}
+
+function jklAction(mode) {
+  setStatus(`J/K/L: ${mode} — use atalhos do Resolve durante decupagem`, '#8a8a90');
+}
+
+function applyGcValidation(el) {
+  const row = el.closest('.script-line');
+  if (!row || !row.classList.contains('type-gc')) return;
+  let v = el.value.toUpperCase();
+  if (v.length > GC_MAX_CHARS) v = v.slice(0, GC_MAX_CHARS);
+  if (v !== el.value) el.value = v;
+  row.classList.toggle('gc-over', v.length >= GC_MAX_CHARS);
+}
+
+function onTapSyncKey(e) {
+  if (e.key !== ' ' && e.key !== 'Enter') return;
+  const tag = document.activeElement?.tagName;
+  if (tag === 'TEXTAREA' || tag === 'INPUT') {
+    if (!playbackActive || e.key === ' ') return;
+  }
+  if (e.key === ' ' && tag === 'TEXTAREA') return;
+  e.preventDefault();
+  tapSyncAdvance();
+}
+
+function advanceAfterTapSync() {
+  if (!tapSyncPendingAdvance) return;
+  tapSyncPendingAdvance = false;
+  const next = Math.min(activeLineIndex + 1, parsedLines.length - 1);
+  highlightActiveLine(next, true);
+  const inp = document.querySelector(`.line-input[data-index="${next}"]`);
+  if (inp) inp.focus();
+  setFooterStatus(`Linha ${next + 1} — continue tap-sync`);
+  renderSyncRail();
+}
+const PANEL_STORAGE_KEY = 'ssync_panel_v2';
+
+const INTRO_STEP_DEFS = [
+  {
+    id: 'welcome',
+    label: 'Início',
+    render() {
+      return `<div class="intro-welcome">
+        <h2><span>SS</span>criptSync v2</h2>
+        <p>${escapeHtml(APP_REFERENCE.lead)}</p>
+        <ul class="intro-tips" style="margin-top:16px;text-align:left;max-width:420px;margin-left:auto;margin-right:auto">
+          ${(APP_REFERENCE.sections.find(s => s.id === 'tips')?.tips || []).slice(0, 3).map(t => `<li>${escapeHtml(t)}</li>`).join('')}
+        </ul>
+      </div>`;
+    },
+  },
+  {
+    id: 'workflow',
+    label: 'Fluxo',
+    sectionIds: ['editor', 'link', 'notes'],
+  },
+  {
+    id: 'timeline',
+    label: 'Timeline',
+    sectionIds: ['clips', 'nav', 'toolbar'],
+  },
+  {
+    id: 'shortcuts',
+    label: 'Atalhos',
+    sectionIds: ['global'],
+    extraTips: true,
+  },
+];
+
+let introStepIndex = 0;
 
 /** Fonte única da referência rápida — manter em sync com docs/SHORTCUTS.md */
 const APP_REFERENCE = {
@@ -641,7 +1029,7 @@ const APP_REFERENCE = {
         'Clipes de áudio (A1, A2…) aparecem no painel CLIPS para Link Mode.',
         'Clique no clipe → playhead + marca in/out no Resolve (destaque visual).',
         'Linhas conectoras amarelas destacam clip / linha selecionados.',
-        'Resolve: Workspace → Scripts → SScriptSync_v1',
+        'Arraste clipes da esquerda para o Media Pool para ligar às linhas do roteiro.',
       ],
     },
   ],
@@ -650,33 +1038,156 @@ const APP_REFERENCE = {
 let openMenuId = null;
 let introOpen = false;
 
-function renderIntroContent() {
+function renderIntroSection(sec) {
+  if (sec.tips) {
+    return `<section class="intro-section full" id="intro-${sec.id}">
+      <div class="intro-section-hdr"><span class="ico">${sec.icon}</span>${sec.title}</div>
+      <ul class="intro-tips">${sec.tips.map(t => `<li>${escapeHtml(t)}</li>`).join('')}</ul>
+    </section>`;
+  }
+  const rows = (sec.items || []).map(it => {
+    const keys = (it.keys || []).map(k => `<kbd class="intro-kbd">${escapeHtml(k)}</kbd>`).join('');
+    return `<div class="intro-row"><div class="intro-keys">${keys}</div><div class="intro-desc">${escapeHtml(it.desc)}</div></div>`;
+  }).join('');
+  return `<section class="intro-section${sec.full ? ' full' : ''}" id="intro-${sec.id}">
+    <div class="intro-section-hdr"><span class="ico">${sec.icon}</span>${sec.title}</div>${rows}
+  </section>`;
+}
+
+function renderIntroStepDots() {
+  const wrap = document.getElementById('intro-steps');
+  if (!wrap) return;
+  wrap.innerHTML = INTRO_STEP_DEFS.map((step, i) =>
+    `<button type="button" class="intro-step-dot${i === introStepIndex ? ' active' : ''}${i < introStepIndex ? ' done' : ''}"
+      role="tab" aria-selected="${i === introStepIndex}" aria-label="${escapeHtml(step.label)}"
+      onclick="goIntroStep(${i})"></button>`
+  ).join('');
+}
+
+function renderIntroStepContent() {
   const lead = document.getElementById('intro-lead');
   const body = document.getElementById('intro-body');
+  const prevBtn = document.getElementById('intro-prev-btn');
+  const nextBtn = document.getElementById('intro-next-btn');
   if (!body) return;
-  if (lead) lead.textContent = APP_REFERENCE.lead;
-  body.innerHTML = APP_REFERENCE.sections.map(sec => {
-    if (sec.tips) {
-      return `<section class="intro-section full" id="intro-${sec.id}">
-        <div class="intro-section-hdr"><span class="ico">${sec.icon}</span>${sec.title}</div>
-        <ul class="intro-tips">${sec.tips.map(t => `<li>${escapeHtml(t)}</li>`).join('')}</ul>
-      </section>`;
+
+  const step = INTRO_STEP_DEFS[introStepIndex];
+  if (lead) lead.style.display = introStepIndex === 0 ? 'none' : 'block';
+
+  if (step.render) {
+    if (lead) lead.textContent = '';
+    body.innerHTML = step.render();
+    body.className = 'intro-body intro-step-view';
+  } else {
+    if (lead) lead.textContent = introStepIndex === 1
+      ? 'Escreva, ligue linhas a clipes e navegue entre roteiro e timeline.'
+      : introStepIndex === 2
+        ? 'Clipes, sync rail e painéis colapsáveis — mais espaço para o roteiro.'
+        : 'Atalhos e dicas finais.';
+    const ids = step.sectionIds || [];
+    const sections = APP_REFERENCE.sections.filter(s => ids.includes(s.id));
+    body.innerHTML = sections.map(renderIntroSection).join('');
+    if (step.extraTips) {
+      const tipsSec = APP_REFERENCE.sections.find(s => s.id === 'tips');
+      if (tipsSec) body.innerHTML += renderIntroSection(tipsSec);
     }
-    const rows = (sec.items || []).map(it => {
-      const keys = (it.keys || []).map(k => `<kbd class="intro-kbd">${escapeHtml(k)}</kbd>`).join('');
-      return `<div class="intro-row"><div class="intro-keys">${keys}</div><div class="intro-desc">${escapeHtml(it.desc)}</div></div>`;
-    }).join('');
-    return `<section class="intro-section${sec.full ? ' full' : ''}" id="intro-${sec.id}">
-      <div class="intro-section-hdr"><span class="ico">${sec.icon}</span>${sec.title}</div>${rows}
-    </section>`;
-  }).join('');
+    body.className = introStepIndex >= 2 ? 'intro-body' : 'intro-body intro-step-view';
+  }
+
+  if (prevBtn) prevBtn.disabled = introStepIndex <= 0;
+  if (nextBtn) {
+    const last = introStepIndex >= INTRO_STEP_DEFS.length - 1;
+    nextBtn.textContent = last ? 'Começar ✓' : 'Próximo →';
+    nextBtn.classList.toggle('primary', true);
+  }
+  renderIntroStepDots();
+}
+
+function goIntroStep(index) {
+  introStepIndex = Math.max(0, Math.min(INTRO_STEP_DEFS.length - 1, index));
+  renderIntroStepContent();
+}
+
+function introStepNext() {
+  if (introStepIndex >= INTRO_STEP_DEFS.length - 1) {
+    closeIntro();
+    return;
+  }
+  goIntroStep(introStepIndex + 1);
+}
+
+function introStepPrev() {
+  goIntroStep(introStepIndex - 1);
+}
+
+function loadPanelState() {
+  try {
+    const s = JSON.parse(localStorage.getItem(PANEL_STORAGE_KEY) || '{}');
+    if (s.timelineCollapsed) setTimelinePanelCollapsed(true, false);
+  } catch (_) { /* ignore */ }
+}
+
+function savePanelState() {
+  try {
+    localStorage.setItem(PANEL_STORAGE_KEY, JSON.stringify({
+      timelineCollapsed: document.body.classList.contains('timeline-collapsed'),
+    }));
+  } catch (_) { /* ignore */ }
+}
+
+function setSyncPanelCollapsed(collapsed, relayout = true) {
+  document.body.classList.toggle('sync-collapsed', collapsed);
+  document.body.classList.toggle('node-rail-collapsed', collapsed);
+  document.body.classList.toggle('pool-collapsed', collapsed);
+  const btn = document.getElementById('sync-panel-toggle');
+  const expand = document.getElementById('pool-expand-tab');
+  if (btn) {
+    btn.textContent = collapsed ? '◀' : '▶';
+    btn.title = collapsed ? 'Mostrar media pool' : 'Ocultar media pool';
+    btn.setAttribute('aria-expanded', String(!collapsed));
+  }
+  if (expand) expand.setAttribute('aria-hidden', String(!collapsed));
+  if (relayout) setTimeout(() => scheduleLayoutUpdate(), 320);
+}
+
+function setTimelinePanelCollapsed(collapsed, relayout = true) {
+  document.body.classList.toggle('timeline-collapsed', collapsed);
+  const btn = document.getElementById('timeline-panel-toggle');
+  const expand = document.getElementById('timeline-expand-tab');
+  if (btn) {
+    btn.textContent = collapsed ? '▶' : '◀';
+    btn.title = collapsed ? 'Mostrar clipes' : 'Ocultar clipes';
+    btn.setAttribute('aria-expanded', String(!collapsed));
+  }
+  if (expand) expand.setAttribute('aria-hidden', String(!collapsed));
+  if (relayout) setTimeout(() => scheduleLayoutUpdate(), 320);
+}
+
+function toggleSyncPanel() {
+  setSyncPanelCollapsed(!document.body.classList.contains('sync-collapsed'));
+  savePanelState();
+}
+
+function toggleTimelinePanel() {
+  setTimelinePanelCollapsed(!document.body.classList.contains('timeline-collapsed'));
+  savePanelState();
+}
+
+function isSyncPanelCollapsed() {
+  return document.body.classList.contains('sync-collapsed');
+}
+
+function renderIntroContent() {
+  introStepIndex = 0;
+  renderIntroStepContent();
 }
 
 function openIntro(force = false) {
   const overlay = document.getElementById('intro-overlay');
   if (!overlay) return;
   closeAllMenus();
-  renderIntroContent();
+  introStepIndex = 0;
+  renderIntroStepContent();
   overlay.classList.remove('hidden');
   overlay.setAttribute('aria-hidden', 'false');
   introOpen = true;
@@ -755,9 +1266,17 @@ function updateSyncMenuChecks() {
 
 document.addEventListener('click', e => {
   if (e.target.closest('.menu-list') || e.target.closest('.menu-trigger')) return;
+  if (e.target.closest('.line-menu-list') || e.target.closest('.line-menu-btn')) return;
   closeAllMenus();
+  closeAllLineMenus();
 });
 document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+    e.preventDefault();
+    toggleMenu('menu-more', e);
+    setTimeout(() => document.getElementById('find-input-visible')?.focus(), 50);
+    return;
+  }
   if (e.key === 'F1') {
     e.preventDefault();
     openIntro(true);
@@ -768,6 +1287,18 @@ document.addEventListener('keydown', e => {
     closeAllMenus();
   }
 });
+
+function syncScriptFind(value) {
+  const hidden = document.getElementById('find-input');
+  if (hidden) hidden.value = value;
+  applyFindFilter();
+}
+
+function getSelectedLineIndices() {
+  if (selectedLines.size) return [...selectedLines].sort((a, b) => a - b);
+  if (activeLineIndex >= 0) return [activeLineIndex];
+  return [];
+}
 
 function getHighlightedLineSet() {
   const set = new Set(selectedLines);
@@ -788,6 +1319,17 @@ function hasActiveLinkVisual() {
 
 function findClipDomElement(link) {
   if (!link) return null;
+  for (let lineIdx = 0; lineIdx < parsedLines.length; lineIdx++) {
+    const line = parsedLines[lineIdx];
+    const match = getLineLinks(line).some(lk => {
+      if (lk.link_type !== 'clip') return false;
+      if (link.link_id && lk.link_id === link.link_id) return true;
+      return linkMatchesClip(lk, { clip_index: link.clip_index, clip_uid: link.clip_uid });
+    });
+    if (!match) continue;
+    const node = document.querySelector(`.sync-node-v0[data-line-index="${lineIdx}"]`);
+    if (node) return node;
+  }
   if (link.clip_index != null) {
     const byIdx = document.querySelector(
       `.clip-item[data-clip-index="${link.clip_index}"]:not(.clip-hidden)`
@@ -810,7 +1352,8 @@ function findClipDomElement(link) {
 }
 
 function getClipRightAnchor(clipEl, mainRect) {
-  const r = clipEl.getBoundingClientRect();
+  const thumb = clipEl.querySelector?.('.spine-thumb-img:not(.empty)') || clipEl;
+  const r = thumb.getBoundingClientRect();
   return {
     x: r.right + CLIP_EDGE_OUTSET - mainRect.left,
     y: r.top + r.height / 2 - mainRect.top,
@@ -818,7 +1361,8 @@ function getClipRightAnchor(clipEl, mainRect) {
 }
 
 function getLineBarAnchor(lineEl, mainRect) {
-  const r = lineEl.getBoundingClientRect();
+  const card = lineEl.querySelector('.script-row') || lineEl.querySelector('.script-card') || lineEl;
+  const r = card.getBoundingClientRect();
   return {
     x: r.left + LINE_BAR_INSET - mainRect.left,
     y: r.top + r.height / 2 - mainRect.top,
@@ -826,21 +1370,35 @@ function getLineBarAnchor(lineEl, mainRect) {
 }
 
 function buildClipToLinePathD(clipPt, linePt) {
-  const x0 = linePt.x;
-  const y0 = linePt.y;
-  const x2 = clipPt.x;
-  const y2 = clipPt.y;
-  const x1 = x0 - LINK_STUB;
-  if (Math.abs(y2 - y0) < 4) {
-    return `M ${x2} ${y0} L ${x1} ${y0} L ${x0} ${y0}`;
+  const xLine = linePt.x;
+  const yLine = linePt.y;
+  const xClip = clipPt.x;
+  const yClip = clipPt.y;
+  const stub = LINE_BAR_INSET;
+  const xStub = xLine - stub;
+  if (Math.abs(yClip - yLine) < 6) {
+    return `M ${xClip} ${yLine} L ${xStub} ${yLine} L ${xLine} ${yLine}`;
   }
-  const cx = x1 - Math.max(14, (x1 - x2) * 0.38);
-  return `M ${x2} ${y2} C ${cx} ${y2}, ${cx} ${y0}, ${x1} ${y0} L ${x0} ${y0}`;
+  const dx = Math.max(28, (xStub - xClip) * 0.45);
+  const cx1 = xClip + dx * 0.55;
+  const cx2 = xStub - dx * 0.35;
+  return `M ${xClip} ${yClip} C ${cx1} ${yClip}, ${cx2} ${yLine}, ${xStub} ${yLine} L ${xLine} ${yLine}`;
 }
 
 function updateConnectionHighlights() {
   const hiLines = getHighlightedLineSet();
   const hasFocus = focusedClipIndex >= 0 || hiLines.size > 0;
+  const hiClipIndexes = new Set();
+  if (focusedClipIndex >= 0) hiClipIndexes.add(focusedClipIndex);
+  hiLines.forEach(lineIdx => {
+    const line = parsedLines[lineIdx];
+    if (!line) return;
+    getLineLinks(line).forEach(link => {
+      if (link.clip_index != null) hiClipIndexes.add(link.clip_index);
+      const clip = timelineClips.find(c => linkMatchesClip(link, c));
+      if (clip) hiClipIndexes.add(clip.clip_index);
+    });
+  });
 
   document.querySelectorAll('.script-line').forEach(el => {
     const idx = parseInt(el.dataset.index, 10);
@@ -848,28 +1406,19 @@ function updateConnectionHighlights() {
   });
 
   if (!hasFocus) {
-    document.querySelectorAll('.clip-item.conn-highlight, .sync-thumb-card.conn-highlight').forEach(el => {
+    document.querySelectorAll('.clip-item.conn-highlight, .sync-node-v0.conn-highlight').forEach(el => {
       el.classList.remove('conn-highlight');
     });
-    document.querySelectorAll('.sync-node.conn-node').forEach(el => el.classList.remove('conn-node'));
     return;
   }
 
   document.querySelectorAll('.clip-item').forEach(el => {
     const idx = parseInt(el.dataset.clipIndex, 10);
-    el.classList.toggle('conn-highlight', idx === focusedClipIndex);
+    el.classList.toggle('conn-highlight', hiClipIndexes.has(idx));
   });
-  document.querySelectorAll('.sync-thumb-card').forEach(el => {
-    const idx = parseInt(el.dataset.clipIndex, 10);
-    el.classList.toggle('conn-highlight', idx === focusedClipIndex);
-  });
-  document.querySelectorAll('.sync-node').forEach(el => el.classList.remove('conn-node'));
-  parsedLines.forEach((line, lineIdx) => {
-    if (!hiLines.has(lineIdx) && focusedClipIndex < 0) return;
-    getLineLinks(line).forEach(link => {
-      if (!isLinkHighlighted(lineIdx, link)) return;
-      findSyncNode(lineIdx, link)?.classList.add('conn-node');
-    });
+  document.querySelectorAll('.sync-node-v0').forEach(el => {
+    const idx = parseInt(el.dataset.lineIndex, 10);
+    el.classList.toggle('conn-highlight', hiLines.has(idx) || idx === activeLineIndex);
   });
 }
 
@@ -894,6 +1443,7 @@ function getLineLinks(line) {
       link_id: line.link_id,
       link_type: line.link_type || 'clip',
       link_color: line.link_color,
+      link_label: line.link_label,
       clip_uid: line.clip_uid,
       clip_index: line.clip_index,
       clip_name: line.clip_name,
@@ -935,11 +1485,8 @@ function noteTimecodeTick() {
   }, 900);
 }
 
-function findSyncNode(lineIdx, link) {
-  if (link?.clip_index == null) return null;
-  return document.querySelector(
-    `.sync-col[data-clip-index="${link.clip_index}"] .sync-node[data-line-index="${lineIdx}"]`
-  );
+function findSyncNode(lineIdx) {
+  return document.querySelector(`.sync-node-v0[data-line-index="${lineIdx}"]`);
 }
 
 function truncateLabel(text, max = 14) {
@@ -952,9 +1499,24 @@ function syncRailKey() {
   const clipPart = timelineClips.map(c => `${c.clip_uid || c.clip_index}:${c.start_frame}`).join('|');
   const linkPart = parsedLines
     .flatMap(l => getLineLinks(l))
-    .map(lk => `${lk.link_id || ''}:${lk.clip_uid || lk.clip_index}:${lk.start_tc || ''}`)
+    .map(lk => `${lk.link_id || ''}:${lk.link_label || ''}:${lk.clip_uid || lk.clip_index}:${lk.start_tc || ''}`)
     .join('|');
-  return `${clipPart}::${linkPart}`;
+  return `${parsedLines.length}::${clipPart}::${linkPart}`;
+}
+
+function renderLineGutter() {
+  /* v0: coverage via minimap — gutter hidden */
+}
+
+function syncGutterRowHeights() {
+  document.querySelectorAll('.gutter-row').forEach(gr => {
+    const idx = parseInt(gr.dataset.index, 10);
+    const lineEl = document.querySelector(`.script-line[data-index="${idx}"]:not(.find-hidden)`);
+    if (lineEl) {
+      gr.style.minHeight = `${lineEl.offsetHeight}px`;
+      gr.style.height = `${lineEl.offsetHeight}px`;
+    }
+  });
 }
 
 function scheduleLayoutUpdate() {
@@ -962,7 +1524,7 @@ function scheduleLayoutUpdate() {
   if (layoutTimer) return;
   layoutTimer = setTimeout(() => {
     layoutTimer = null;
-    positionSyncNodes();
+    updateRailMetrics();
     updatePlayheadRuler();
     if (hasActiveLinkVisual()) drawLinkConnections();
   }, 96);
@@ -974,7 +1536,7 @@ function scheduleScrollSync() {
   scrollRaf = requestAnimationFrame(() => {
     scrollRaf = null;
     if (!playbackActive) {
-      positionSyncNodes();
+      updateRailMetrics();
       updatePlayheadRuler();
     }
     if (hasActiveLinkVisual()) drawLinkConnections();
@@ -982,64 +1544,15 @@ function scheduleScrollSync() {
 }
 
 function drawLinkConnections() {
-  const svg = document.getElementById('link-svg');
-  if (!svg) return;
-  if (!hasActiveLinkVisual()) {
-    updateConnectionHighlights();
-    svg.innerHTML = '';
-    return;
-  }
-
-  const pairs = [];
-  parsedLines.forEach((line, idx) => {
-    getLineLinks(line).forEach(link => {
-      if (link.link_type === 'clip' && link.clip_index != null) {
-        pairs.push({ lineIdx: idx, link });
-      }
-    });
-  });
+  computeWorkspacePaths();
   updateConnectionHighlights();
-  if (!pairs.length) { svg.innerHTML = ''; return; }
-
-  const main = document.getElementById('main');
-  if (!main) return;
-  const mainRect = main.getBoundingClientRect();
-  const frag = document.createDocumentFragment();
-
-  pairs.forEach(({ lineIdx, link }) => {
-    if (!isLinkHighlighted(lineIdx, link)) return;
-    const clipEl = findClipDomElement(link);
-    const lineEl = document.querySelector(`.script-line[data-index="${lineIdx}"]:not(.find-hidden)`);
-    if (!clipEl || !lineEl) return;
-
-    const linePt = getLineBarAnchor(lineEl, mainRect);
-    const clipPt = getClipRightAnchor(clipEl, mainRect);
-    const stroke = link.link_color || '#facc15';
-
-    const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-    dot.setAttribute('cx', String(linePt.x));
-    dot.setAttribute('cy', String(linePt.y));
-    dot.setAttribute('r', '3.2');
-    dot.setAttribute('fill', stroke);
-    dot.setAttribute('class', 'link-anchor');
-    frag.appendChild(dot);
-
-    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    path.setAttribute('d', buildClipToLinePathD(clipPt, linePt));
-    path.setAttribute('stroke', stroke);
-    path.setAttribute('class', 'link-hi');
-    path.setAttribute('fill', 'none');
-    path.setAttribute('stroke-linecap', 'round');
-    frag.appendChild(path);
-  });
-
-  svg.innerHTML = '';
-  svg.appendChild(frag);
 }
 
 function applyFindFilter() {
   const q = (document.getElementById('find-input')?.value || '').trim().toLowerCase();
-  document.querySelectorAll('.script-line').forEach(el => {
+  const visible = document.getElementById('find-input-visible');
+  if (visible && visible.value !== q) visible.value = q;
+  document.querySelectorAll('.script-block').forEach(el => {
     const idx = parseInt(el.dataset.index, 10);
     const text = (parsedLines[idx]?.text || '').toLowerCase();
     el.classList.toggle('find-hidden', Boolean(q) && !text.includes(q));
@@ -1053,24 +1566,11 @@ function setProjectLabel(name) {
 }
 
 function updatePlayheadRuler() {
-  const band = document.getElementById('playhead-band');
-  const body = document.getElementById('editor-body');
-
   if (lastPlayheadIndex >= 0 && lastPlayheadIndex !== activeLineIndex) {
     document.querySelector(`.script-line[data-index="${lastPlayheadIndex}"]`)?.classList.remove('playhead-row');
   }
   if (activeLineIndex >= 0) {
     document.querySelector(`.script-line[data-index="${activeLineIndex}"]`)?.classList.add('playhead-row');
-    const lineEl = document.querySelector(`.script-line[data-index="${activeLineIndex}"]`);
-    if (band && body && lineEl) {
-      const bodyRect = body.getBoundingClientRect();
-      const lr = lineEl.getBoundingClientRect();
-      band.style.display = 'block';
-      band.style.top = `${lr.top - bodyRect.top}px`;
-      band.style.height = `${Math.max(lr.height, 28)}px`;
-    }
-  } else if (band) {
-    band.style.display = 'none';
   }
   lastPlayheadIndex = activeLineIndex;
 }
@@ -1109,11 +1609,19 @@ function updateScenePageSelects() {
   }
 }
 
-function scrollToLine(index) {
+function scrollToLine(index, skipHighlight = false) {
   if (index < 0) return;
-  const el = document.querySelector(`.script-line[data-index="${index}"]`);
-  if (el) el.scrollIntoView({ block: 'center', behavior: 'auto' });
-  highlightActiveLine(index, false);
+  const block = document.querySelector(`.script-block[data-index="${index}"]:not(.find-hidden)`);
+  const body = document.getElementById('workspace-body');
+  if (block && body) {
+    const bodyRect = body.getBoundingClientRect();
+    const lr = block.getBoundingClientRect();
+    const target = body.scrollTop + (lr.top - bodyRect.top) - body.clientHeight / 2 + lr.height / 2;
+    body.scrollTop = Math.max(0, target);
+    updateMinimapViewport();
+    positionSpineNodes();
+  }
+  if (!skipHighlight) highlightActiveLine(index, false);
 }
 
 function goToScene(val) {
@@ -1212,16 +1720,17 @@ function setClipFilter(type) {
 function applyClipFindFilter() {
   const q = (document.getElementById('clip-find-input')?.value || '').trim().toLowerCase();
   document.querySelectorAll('.clip-item').forEach(el => {
-    const name = el.querySelector('.clip-name')?.textContent?.toLowerCase() || '';
+    const scene = el.querySelector('.media-scene')?.textContent?.toLowerCase() || '';
     const tc = (el.dataset.tc || '').toLowerCase();
-    const track = (el.dataset.trackLabel || '').toLowerCase();
+    const track = (el.dataset.trackLabel || el.dataset.trackType || '').toLowerCase();
     const type = el.dataset.trackType || 'video';
     const typeOk = clipFilterType === 'all'
       || (clipFilterType === 'video' && type === 'video')
       || (clipFilterType === 'audio' && type === 'audio');
-    const textOk = !q || name.includes(q) || tc.includes(q) || track.includes(q);
+    const textOk = !q || scene.includes(q) || tc.includes(q) || track.includes(q);
     el.classList.toggle('clip-hidden', !typeOk || !textOk);
   });
+  bindClipDragSources();
   if (hasActiveLinkVisual()) scheduleScrollSync();
 }
 
@@ -1232,6 +1741,7 @@ function focusClipInResolve(clip) {
   document.querySelectorAll('.clip-item').forEach(el => {
     el.classList.toggle('focused', parseInt(el.dataset.clipIndex, 10) === focusedClipIndex);
   });
+  updateConnectionHighlights();
   backend.focus_clip(JSON.stringify(clip));
 }
 
@@ -1276,8 +1786,7 @@ function toggleLinkMode() {
   } else {
     selectedLines.clear();
     setLinkHint('');
-    renderLines(parsedLines);
-    renderClips(timelineClips);
+    updateLineSelectionUi();
     drawLinkConnections();
     scheduleLayoutUpdate();
   }
@@ -1299,12 +1808,21 @@ function focusLineConnections(index) {
   focusedClipIndex = clip ? clip.clip_index : (clipLink.clip_index ?? -1);
 }
 
+function updateLineSelectionUi() {
+  document.querySelectorAll('.script-line').forEach(el => {
+    const idx = parseInt(el.dataset.index, 10);
+    el.classList.toggle('selected', selectedLines.has(idx));
+  });
+  updateConnectionHighlights();
+  computeWorkspacePaths();
+}
+
 function toggleLineSelection(index, event) {
-  if (event.shiftKey && lastSelectedIndex >= 0) {
+  if (event?.shiftKey && lastSelectedIndex >= 0) {
     const a = Math.min(lastSelectedIndex, index);
     const b = Math.max(lastSelectedIndex, index);
     for (let i = a; i <= b; i++) selectedLines.add(i);
-  } else if (event.ctrlKey || event.metaKey) {
+  } else if (event?.ctrlKey || event?.metaKey) {
     if (selectedLines.has(index)) selectedLines.delete(index);
     else selectedLines.add(index);
     lastSelectedIndex = index;
@@ -1313,18 +1831,22 @@ function toggleLineSelection(index, event) {
     selectedLines.add(index);
     lastSelectedIndex = index;
   }
+  activeLineIndex = index;
   focusLineConnections(index);
-  renderLines(parsedLines);
-  setLinkHint(`${selectedLines.size} line(s) selected`);
-  drawLinkConnections();
+  updateLineSelectionUi();
+  const n = selectedLines.size;
+  setLinkHint(`${n} linha(s) selecionada(s)`);
+  setStatus(`Link Mode: ${n} linha(s) — clique ou arraste um clip`, '#facc15');
+  renderTakeCards();
 }
 
 function linkToPlayhead() {
-  if (!backend || !selectedLines.size) {
-    setStatus('Select lines first', '#f6c177');
+  if (!backend) return;
+  const indices = getSelectedLineIndices();
+  if (!indices.length) {
+    setStatus('Selecione linha(s) no roteiro', '#f6c177');
     return;
   }
-  const indices = [...selectedLines].sort((a, b) => a - b);
   activeLineIndex = indices[0];
   backend.link_lines_to_playhead(JSON.stringify(indices));
   selectedLines.clear();
@@ -1332,30 +1854,239 @@ function linkToPlayhead() {
 }
 
 function unlinkSelected() {
-  if (!backend || !selectedLines.size) return;
-  backend.unlink_lines(JSON.stringify([...selectedLines]));
+  if (!backend) return;
+  const indices = getSelectedLineIndices();
+  if (!indices.length) {
+    setStatus('Selecione linha(s) para desvincular', '#f6c177');
+    return;
+  }
+  backend.unlink_lines(JSON.stringify(indices));
   selectedLines.clear();
   scheduleLayoutUpdate();
 }
 
 function linkSelectionToClip(clip) {
-  if (!backend || !selectedLines.size || !clip) return;
-  const linkedIndices = [...selectedLines].sort((a, b) => a - b);
-  backend.link_lines_to_clip(JSON.stringify(linkedIndices), JSON.stringify(clip));
-  focusedClipIndex = clip.clip_index;
-  activeLineIndex = linkedIndices[0];
+  linkClipToScript(clip);
+}
+
+function resolveLinkTargetLines() {
+  if (selectedLines.size) return [...selectedLines].sort((a, b) => a - b);
+  if (activeLineIndex >= 0) return [activeLineIndex];
+  return [];
+}
+
+function lineIndexAtClientY(clientY) {
+  const rows = document.querySelectorAll('.script-line:not(.find-hidden)');
+  for (const el of rows) {
+    const r = el.getBoundingClientRect();
+    if (clientY >= r.top && clientY <= r.bottom) {
+      return parseInt(el.dataset.index, 10);
+    }
+  }
+  return -1;
+}
+
+function resolveClipForLink(clip) {
+  if (!clip) return null;
+  const full = timelineClips.find(c =>
+    (clip.clip_index != null && c.clip_index === clip.clip_index)
+    || (clip.clip_uid && c.clip_uid === clip.clip_uid)
+  ) || clip;
+  if (full.start_frame == null || full.end_frame == null) {
+    setStatus('Clipe sem frames — clique Re-sync na toolbar', '#eb6f92');
+    return null;
+  }
+  return full;
+}
+
+function lineIndexFromDropEvent(e) {
+  const spineNode = e.target.closest('.spine-node');
+  if (spineNode) {
+    const idx = parseInt(spineNode.dataset.lineIndex, 10);
+    if (!Number.isNaN(idx)) return idx;
+  }
+  const row = e.target.closest('.script-line');
+  if (row) return parseInt(row.dataset.index, 10);
+  return lineIndexAtClientY(e.clientY);
+}
+
+function linkClipToScript(clip, optionalLines) {
+  const fullClip = resolveClipForLink(clip);
+  if (!fullClip || !backend) return false;
+  let lines = optionalLines?.length ? [...optionalLines].sort((a, b) => a - b) : resolveLinkTargetLines();
+  if (!lines.length) {
+    setStatus('Selecione linha(s) no roteiro ou solte no nó da spine', '#f6c177');
+    return false;
+  }
+  backend.link_lines_to_clip(JSON.stringify(lines), JSON.stringify(fullClip));
+  focusedClipIndex = fullClip.clip_index;
+  activeLineIndex = lines[0];
   selectedLines.clear();
-  setTimeout(() => {
-    focusLineConnections(activeLineIndex);
-    renderClips(timelineClips);
-    drawLinkConnections();
-    scheduleLayoutUpdate();
-  }, 80);
+  updateLineSelectionUi();
+  setStatus(`Ligando ${lines.length} linha(s) ao clip…`, '#9ccfd8');
+  setFooterStatus(`Ligando linha ${lines[0] + 1}…`);
+  return true;
+}
+
+const CLIP_DRAG_MIME = 'application/x-ssync-clip';
+
+function clipFromDragEvent(e) {
+  try {
+    let raw = e.dataTransfer.getData(CLIP_DRAG_MIME);
+    if (!raw) raw = e.dataTransfer.getData('text/plain');
+    if (!raw) return null;
+    const data = raw.startsWith('{') ? JSON.parse(raw) : { clip_index: parseInt(raw, 10) };
+    return timelineClips.find(c => c.clip_index === data.clip_index) || null;
+  } catch (_) {
+    return null;
+  }
+}
+
+function bindClipDragSources() {
+  /* drag handlers attached once via initClipListInteractions */
+}
+
+function onClipDragStart(e) {
+  const el = e.target.closest('.clip-item:not(.clip-hidden)');
+  if (!el) return;
+  const idx = parseInt(el.dataset.clipIndex, 10);
+  const clip = timelineClips.find(c => c.clip_index === idx);
+  if (!clip) return;
+  e.dataTransfer.setData(CLIP_DRAG_MIME, JSON.stringify({ clip_index: clip.clip_index }));
+  e.dataTransfer.setData('text/plain', String(clip.clip_index));
+  e.dataTransfer.effectAllowed = 'copy';
+  el.classList.add('clip-dragging');
+  showPoolDropHint(true);
+}
+
+function onClipDragEnd(e) {
+  const el = e.target.closest('.clip-item');
+  if (el) el.classList.remove('clip-dragging');
+  showPoolDropHint(false);
+  clearPoolDropTargets();
+}
+
+function onClipListClick(e) {
+  const el = e.target.closest('.clip-item:not(.clip-hidden)');
+  if (!el) return;
+  const idx = parseInt(el.dataset.clipIndex, 10);
+  const clip = timelineClips.find(c => c.clip_index === idx);
+  if (!clip) return;
+  if (linkMode || selectedLines.size) {
+    if (linkClipToScript(clip)) return;
+  }
+  focusClipInResolve(clip);
+}
+
+function initClipListInteractions() {
+  const list = document.getElementById('clips-list');
+  if (!list || list.dataset.uiBound === '1') return;
+  list.dataset.uiBound = '1';
+  list.addEventListener('click', onClipListClick);
+  list.addEventListener('dragstart', onClipDragStart);
+  list.addEventListener('dragend', onClipDragEnd);
+}
+
+function showPoolDropHint(show) {
+  const hint = document.getElementById('v0-drop-zone');
+  const panel = document.getElementById('timeline-panel');
+  if (hint) hint.classList.toggle('visible', show);
+  if (panel) panel.classList.toggle('drag-over', show);
+}
+
+function clearPoolDropTargets() {
+  document.querySelectorAll('.sync-node-v0.drop-target').forEach(el => el.classList.remove('drop-target'));
+  document.getElementById('timeline-panel')?.classList.remove('drag-over');
+  document.getElementById('workspace-body')?.classList.remove('drag-over');
+}
+
+function dragHasClipData(e) {
+  const types = e.dataTransfer?.types;
+  if (!types) return false;
+  const list = Array.from(types);
+  return list.includes(CLIP_DRAG_MIME) || list.includes('text/plain');
+}
+
+function handleMediaPoolDragOver(e) {
+  if (!dragHasClipData(e)) return;
+  e.preventDefault();
+  e.stopPropagation();
+  e.dataTransfer.dropEffect = 'copy';
+  document.getElementById('timeline-panel')?.classList.add('drag-over');
+  const node = e.target.closest('.sync-node-v0');
+  document.querySelectorAll('.sync-node-v0.drop-target').forEach(el => el.classList.remove('drop-target'));
+  if (node) node.classList.add('drop-target');
+}
+
+function handleSpineDrop(e, lineIdx) {
+  if (!dragHasClipData(e)) return;
+  e.preventDefault();
+  e.stopPropagation();
+  showPoolDropHint(false);
+  clearPoolDropTargets();
+  const dragged = clipFromDragEvent(e);
+  if (!dragged || Number.isNaN(lineIdx) || lineIdx < 0) return;
+  if (!linkClipToScript(dragged, [lineIdx]) && !linkMode) {
+    toggleLinkMode();
+    setStatus('Link Mode ON — solte de novo no marcador da linha', '#f6c177');
+  }
+}
+
+function handleMediaPoolDrop(e) {
+  if (!dragHasClipData(e)) return;
+  e.preventDefault();
+  e.stopPropagation();
+  showPoolDropHint(false);
+  clearPoolDropTargets();
+  const dragged = clipFromDragEvent(e);
+  if (!dragged) {
+    setStatus('Drop falhou — tente de novo ou use Link Mode + clique', '#eb6f92');
+    return;
+  }
+  const spineNode = e.target.closest('.sync-node-v0');
+  if (spineNode) {
+    handleSpineDrop(e, parseInt(spineNode.dataset.lineIndex, 10));
+    return;
+  }
+  const lineIdx = lineIndexFromDropEvent(e);
+  if (lineIdx >= 0) {
+    linkClipToScript(dragged, [lineIdx]);
+    return;
+  }
+  if (!linkClipToScript(dragged) && !linkMode) {
+    toggleLinkMode();
+    setStatus('Link Mode ON — solte no marcador da linha desejada', '#f6c177');
+  }
+}
+
+function initMediaPoolDragDrop() {
+  const targets = [
+    document.getElementById('timeline-panel'),
+    document.getElementById('clips-list'),
+    document.getElementById('workspace-body'),
+  ].filter(Boolean);
+  targets.forEach(el => {
+    if (el.dataset.dndBound === '1') return;
+    el.dataset.dndBound = '1';
+    el.addEventListener('dragover', handleMediaPoolDragOver);
+    el.addEventListener('dragleave', e => {
+      if (!el.contains(e.relatedTarget)) {
+        el.classList.remove('drag-over');
+        clearPoolDropTargets();
+      }
+    });
+    el.addEventListener('drop', handleMediaPoolDrop);
+  });
 }
 
 function setStatus(message, color) {
-  document.getElementById('status-text').textContent = message;
-  if (color) document.getElementById('status-text').style.color = color;
+  const statusText = document.getElementById('status-text');
+  const footer = document.getElementById('footer-status');
+  if (statusText) {
+    statusText.textContent = message;
+    if (color) statusText.style.color = color;
+  }
+  if (footer && message && !playbackActive) footer.textContent = message;
 }
 
 function setSyncBadge(synced) {
@@ -1363,6 +2094,7 @@ function setSyncBadge(synced) {
   const badge = document.getElementById('sync-badge');
   badge.textContent = synced ? 'SYNCED' : 'NOT SYNCED';
   badge.classList.toggle('on', synced);
+  badge.classList.toggle('synced', synced);
 }
 
 function escapeHtml(text) {
@@ -1392,53 +2124,43 @@ function renderClips(clips) {
       }
     });
   });
-  list.innerHTML = timelineClips.map(c => {
+  list.innerHTML = timelineClips.map((c, ci) => {
     const linked = linkedClipIndexes.has(c.clip_index);
     const isAudio = c.is_audio || c.track_type === 'audio';
+    const isVideo = !isAudio;
     const tkey = thumbKeyForClip(c);
     const thumbUri = clipThumbnails[tkey];
     const thumbBlock = isAudio
       ? `<span class="clip-thumb" data-thumb-key="${tkey}" aria-hidden="true">♪</span>`
       : `<img class="clip-thumb" data-thumb-key="${tkey}"${thumbUri ? ` src="${thumbUri}"` : ''} alt="">`;
-    const badgeCls = isAudio ? ' clip-track-badge audio-badge' : ' clip-track-badge';
     const focused = c.clip_index === focusedClipIndex ? ' focused' : '';
-    return `<div class="clip-item${linked ? ' linked' : ''}${isAudio ? ' audio' : ''}${focused}" data-clip-index="${c.clip_index}" data-clip-uid="${c.clip_uid || ''}" data-tc="${c.start_tc || ''}" data-start-frame="${c.start_frame ?? ''}" data-track-type="${c.track_type || (isAudio ? 'audio' : 'video')}" data-track-label="${escapeHtml(c.track_label || (isAudio ? 'A1' : 'V1'))}">
+    const scene = sceneLabelForClip(c, ci);
+    return `<div class="media-item clip-item${linked ? ' linked' : ''}${isAudio ? ' audio' : ''}${focused}" data-clip-index="${c.clip_index}" data-clip-uid="${c.clip_uid || ''}" data-tc="${c.start_tc || ''}" data-start-frame="${c.start_frame ?? ''}" data-track-type="${c.track_type || (isAudio ? 'audio' : 'video')}" data-track-label="${escapeHtml(c.track_label || (isAudio ? 'A1' : 'V1'))}">
+      <div class="media-item-top">
+        <span class="media-scene">${escapeHtml(scene)}</span>
+        <span class="media-icons">
+          ${isVideo ? '<span class="media-icon video" title="Vídeo">▶</span>' : ''}
+          ${isAudio ? '<span class="media-icon audio" title="Áudio">♪</span>' : ''}
+        </span>
+      </div>
       <div class="clip-thumb-wrap">
         ${thumbBlock}
-        <span class="${badgeCls.trim()}">${escapeHtml(c.track_label || (isAudio ? 'A1' : 'V1'))}</span>
-        <span class="clip-jump" data-clip-index="${c.clip_index}" title="Jump">▶</span>
+        <span class="clip-track-badge${isAudio ? ' audio-badge' : ''}">${escapeHtml(c.track_label || (isAudio ? 'A1' : 'V1'))}</span>
       </div>
-      <div class="clip-meta">
-        <span class="clip-name">${escapeHtml(c.name || 'Clip')}</span>
-        <span class="clip-tc">${c.start_tc || ''} → ${c.end_tc || ''}</span>
+      <div class="media-tc">
+        <span class="tc-in">${escapeHtml(c.start_tc || '--:--:--:--')}</span>
+        <span class="tc-out">${escapeHtml(c.end_tc || '--:--:--:--')}</span>
       </div>
     </div>`;
   }).join('');
 
   list.querySelectorAll('.clip-item').forEach(el => {
-    el.addEventListener('click', e => {
-      if (e.target.classList.contains('clip-jump')) return;
-      const idx = parseInt(el.dataset.clipIndex, 10);
-      const clip = timelineClips.find(c => c.clip_index === idx);
-      if (linkMode && selectedLines.size && clip) {
-        linkSelectionToClip(clip);
-        return;
-      }
-      if (clip) focusClipInResolve(clip);
-    });
+    el.setAttribute('draggable', 'true');
   });
-  list.querySelectorAll('.clip-jump').forEach(btn => {
-    btn.addEventListener('click', e => {
-      e.stopPropagation();
-      const idx = parseInt(btn.dataset.clipIndex, 10);
-      const clip = timelineClips.find(c => c.clip_index === idx);
-      if (clip) focusClipInResolve(clip);
-    });
-  });
-  renderSyncRail();
   applyClipFindFilter();
   applyClipThumbnails();
   requestMissingThumbnails();
+  bindClipDragSources();
 }
 
 function requestMissingThumbnails() {
@@ -1460,112 +2182,216 @@ function requestMissingThumbnails() {
   });
 }
 
-function renderSyncRail(force = false) {
+let openLineMenuIndex = -1;
+
+function closeAllLineMenus() {
+  document.querySelectorAll('.line-menu-wrap.open').forEach(w => w.classList.remove('open'));
+  openLineMenuIndex = -1;
+}
+
+function toggleLineMenu(index, event) {
+  event?.stopPropagation();
+  event?.preventDefault();
+  const wrap = document.querySelector(`.line-menu-wrap[data-index="${index}"]`);
+  if (!wrap) return;
+  if (openLineMenuIndex === index) {
+    closeAllLineMenus();
+    return;
+  }
+  closeAllLineMenus();
+  closeAllMenus();
+  wrap.classList.add('open');
+  openLineMenuIndex = index;
+}
+
+function buildSpineTcHtml(line) {
+  const links = getLineLinks(line);
+  const clipLinks = links.filter(l => l.link_type === 'clip' && l.start_tc);
+  if (clipLinks.length > 1) {
+    return clipLinks.map(lk =>
+      `<span class="spine-tc has-tc" data-tc="${escapeHtml(lk.start_tc || '')}"` +
+      `${lk.link_color ? ` style="color:${lk.link_color}"` : ''}>` +
+      `${escapeHtml(lk.start_tc || '')}</span>`
+    ).join('');
+  }
+  const primary = clipLinks[0] || links[0] || line;
+  const tc = primary?.start_tc || line.start_tc || '--:--:--:--';
+  const hasTc = Boolean(primary?.start_tc || line.start_tc);
+  const color = primary?.link_color || line.link_color || '';
+  const dataTc = hasTc ? ` data-tc="${escapeHtml(tc)}"` : '';
+  const style = color ? ` style="color:${color}"` : '';
+  return `<span class="spine-tc${hasTc ? ' has-tc' : ''}"${dataTc}${style}>${escapeHtml(tc)}</span>`;
+}
+
+function bindSpineTcClicks(node) {
+  node.querySelectorAll('.spine-tc.has-tc').forEach(el => {
+    el.addEventListener('dblclick', e => {
+      e.stopPropagation();
+      if (el.dataset.tc && backend) backend.jump_to_timecode(el.dataset.tc);
+    });
+  });
+}
+
+function startSyncNodeRename(lineIdx) {
+  if (editingSyncNodeIndex >= 0) return;
+  const line = parsedLines[lineIdx];
+  if (!line || !getLineLinks(line).length) return;
+  const clipLink = getLineLinks(line).find(l => l.link_type === 'clip') || getLineLinks(line)[0];
+  const clip = clipLink ? timelineClips.find(c => linkMatchesClip(clipLink, c)) : null;
+  const current = syncNodeFullTitle(line, clip, clipLink);
+
+  editingSyncNodeIndex = lineIdx;
+  const node = findSyncNode(lineIdx);
+  if (!node) {
+    editingSyncNodeIndex = -1;
+    return;
+  }
+  node.classList.add('editing');
+  node.innerHTML = `<input type="text" class="node-rename-input" value="${escapeHtml(current)}" maxlength="48" aria-label="Renomear sync">`;
+  const inp = node.querySelector('.node-rename-input');
+  if (!inp) return;
+  inp.focus();
+  inp.select();
+  inp.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      saveSyncNodeRename(lineIdx, inp.value);
+    }
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      editingSyncNodeIndex = -1;
+      renderTimelineSpine(true);
+    }
+  });
+  inp.addEventListener('blur', () => {
+    if (editingSyncNodeIndex === lineIdx) saveSyncNodeRename(lineIdx, inp.value);
+  });
+  inp.addEventListener('click', e => e.stopPropagation());
+  inp.addEventListener('mousedown', e => e.stopPropagation());
+}
+
+function saveSyncNodeRename(lineIdx, label) {
+  if (editingSyncNodeIndex !== lineIdx) return;
+  editingSyncNodeIndex = -1;
+  if (!backend) {
+    renderTimelineSpine(true);
+    return;
+  }
+  backend.set_sync_node_label(lineIdx, (label || '').trim());
+}
+
+function renderTimelineSpine(force = false) {
+  if (editingSyncNodeIndex >= 0 && !force) {
+    updateRailMetrics();
+    return;
+  }
   const key = syncRailKey();
   if (!force && key === lastRailKey) {
-    positionSyncNodes();
+    updateRailMetrics();
     return;
   }
   lastRailKey = key;
-  const thumbs = document.getElementById('sync-thumbs-row');
-  const tracks = document.getElementById('sync-tracks');
-  const panel = document.getElementById('sync-panel');
-  if (!thumbs || !tracks) return;
+  const container = document.getElementById('sync-nodes');
+  if (!container) return;
 
-  if (!timelineClips.length) {
-    thumbs.innerHTML = '';
-    tracks.innerHTML = '<div style="font-size:9px;color:var(--muted);text-align:center;padding:8px 4px">Add clips to timeline</div>';
-    if (panel) panel.style.width = '88px';
+  if (!parsedLines.length) {
+    container.innerHTML = '';
+    updateRailMetrics();
     return;
   }
 
-  if (panel) panel.style.width = `${Math.min(360, Math.max(88, timelineClips.length * SYNC_COL_W + 16))}px`;
+  container.innerHTML = '';
+  parsedLines.forEach((line, idx) => {
+    const links = getLineLinks(line);
+    const clipLink = links.find(l => l.link_type === 'clip' && l.clip_index != null) || links[0];
+    const clip = clipLink ? timelineClips.find(c => linkMatchesClip(clipLink, c)) : null;
+    const linked = links.length > 0;
+    const colorCls = clip ? colorClassForClip(clip) : 'gray';
+    const label = syncNodeLabel(line, clip, clipLink);
+    const title = syncNodeFullTitle(line, clip, clipLink);
 
-  thumbs.innerHTML = timelineClips.map(c => {
-    const label = truncateLabel(c.name || 'Clip', 14);
-    const tkey = thumbKeyForClip(c);
-    const linked = linesForClip(c).length > 0;
-    return `<div class="sync-thumb-card" data-clip-index="${c.clip_index}" data-tc="${c.start_tc || ''}" title="${escapeHtml((c.track_label || 'V1') + ' · ' + (c.name || ''))}">
-      <div class="sync-thumb-img${linked ? ' linked' : ''}" data-thumb-key="${tkey}">
-        ${thumbHtml(c, '#666', label)}
-      </div>
-      <span class="sync-thumb-label">${escapeHtml(c.track_label || 'V1')}</span>
-    </div>`;
-  }).join('');
+    const node = document.createElement('div');
+    node.className = `sync-node-v0 color-${colorCls}${linked ? ' linked' : ''}${idx === activeLineIndex ? ' active' : ''}`;
+    node.dataset.lineIndex = String(idx);
+    node.dataset.anchor = linked ? `node-${idx}` : '';
+    node.innerHTML = linked
+      ? `<div class="node-ring" title="${escapeHtml(title)} — duplo-clique para renomear">
+          <span class="node-label">${escapeHtml(label)}</span>
+        </div>`
+      : `<div class="node-ring" title="Linha ${idx + 1}"><span class="node-label">${escapeHtml(label)}</span></div>`;
 
-  thumbs.querySelectorAll('.sync-thumb-card').forEach(el => {
-    el.addEventListener('click', () => {
-      const idx = parseInt(el.dataset.clipIndex, 10);
-      const clip = timelineClips.find(c => c.clip_index === idx);
-      if (linkMode && selectedLines.size && clip) {
-        linkSelectionToClip(clip);
+    node.addEventListener('dragover', handleMediaPoolDragOver);
+    node.addEventListener('drop', e => handleSpineDrop(e, idx));
+    node.addEventListener('click', e => {
+      if (e.target.closest('.node-rename-input')) return;
+      e.stopPropagation();
+      if (linkMode) {
+        toggleLineSelection(idx, e);
         return;
       }
+      highlightActiveLine(idx, true);
+      const inp = document.querySelector(`.line-input[data-index="${idx}"]`);
+      if (inp) inp.focus();
       if (clip) focusClipInResolve(clip);
+      computeWorkspacePaths();
     });
+
+    node.addEventListener('dblclick', e => {
+      e.stopPropagation();
+      e.preventDefault();
+      if (linked) startSyncNodeRename(idx);
+    });
+
+    container.appendChild(node);
   });
 
-  tracks.innerHTML = '';
-  const inner = document.createElement('div');
-  inner.style.cssText = 'position:relative;min-height:100%;width:100%';
-  tracks.appendChild(inner);
+  updateRailMetrics();
+  initMediaPoolDragDrop();
+}
 
-  timelineClips.forEach((clip, colIdx) => {
-    const col = document.createElement('div');
-    col.className = 'sync-col';
-    col.dataset.clipIndex = String(clip.clip_index);
-    col.style.cssText = `position:absolute;left:${8 + colIdx * SYNC_COL_W}px;top:0;bottom:0;width:26px`;
+function renderSyncRail(force = false) {
+  renderTimelineSpine(force);
+}
 
-    const trackLine = document.createElement('div');
-    trackLine.className = 'sync-track';
-    col.appendChild(trackLine);
+function updateRailMetrics() {
+  const body = document.getElementById('workspace-body');
+  const lane = document.getElementById('sync-lane');
+  const nodes = document.getElementById('sync-nodes');
+  const linesEl = document.getElementById('lines-container');
+  if (!body || !nodes) return;
 
-    linksForClip(clip).forEach(({ lineIdx, link, linkKey }) => {
-      const line = parsedLines[lineIdx];
-      const node = document.createElement('div');
-      node.className = 'sync-node sync-mark';
-      const color = linkColorForLine(line, link);
-      node.style.setProperty('--mark-color', color);
-      node.dataset.lineIndex = String(lineIdx);
-      node.dataset.clipIndex = String(clip.clip_index);
-      node.dataset.linkKey = linkKey;
-      const tcLabel = link.start_tc || '';
-      node.title = `L${lineIdx + 1} · ${tcLabel} · ${(line.text || '').slice(0, 72)}`;
-      node.addEventListener('click', e => {
-        e.stopPropagation();
-        if (!backend) return;
-        focusLineConnections(lineIdx);
-        activeLineIndex = lineIdx;
-        drawLinkConnections();
-        if (link.start_tc) backend.jump_to_timecode(link.start_tc);
-        else backend.jump_to_line(lineIdx);
-      });
-      col.appendChild(node);
-    });
-    inner.appendChild(col);
+  const contentH = Math.max(linesEl?.scrollHeight || 0, body.clientHeight, 400);
+  if (lane) lane.style.minHeight = `${contentH}px`;
+  nodes.style.minHeight = `${contentH}px`;
+
+  positionSpineNodes();
+  syncGutterRowHeights();
+  renderTakeCards();
+  renderMinimap();
+  computeWorkspacePaths();
+}
+
+function positionSpineNodes() {
+  const scrollEl = document.getElementById('workspace-body');
+  if (!scrollEl) return;
+  const inner = scrollEl.querySelector('.v0-body-inner');
+  const innerRect = inner?.getBoundingClientRect();
+  if (!innerRect) return;
+
+  scrollEl.querySelectorAll('.sync-node-v0').forEach(node => {
+    const idx = parseInt(node.dataset.lineIndex, 10);
+    const block = document.querySelector(`.script-block[data-index="${idx}"]:not(.find-hidden)`);
+    const lineEl = block?.querySelector('.script-line') || document.querySelector(`.script-line[data-index="${idx}"]:not(.find-hidden)`);
+    if (!lineEl) return;
+    const anchor = block || lineEl;
+    const ar = anchor.getBoundingClientRect();
+    const top = ar.top + ar.height / 2 - innerRect.top + scrollEl.scrollTop;
+    node.style.top = `${Math.max(24, top)}px`;
   });
-
-  positionSyncNodes();
 }
 
 function positionSyncNodes() {
-  const linesEl = document.getElementById('lines-container');
-  const tracksEl = document.getElementById('sync-tracks');
-  if (!linesEl || !tracksEl) return;
-
-  const linesRect = linesEl.getBoundingClientRect();
-  const tracksRect = tracksEl.getBoundingClientRect();
-  const scrollTop = linesEl.scrollTop;
-
-  tracksEl.querySelectorAll('.sync-node').forEach(node => {
-    const idx = parseInt(node.dataset.lineIndex, 10);
-    const lineEl = document.querySelector(`.script-line[data-index="${idx}"]`);
-    if (!lineEl) return;
-    const lr = lineEl.getBoundingClientRect();
-    const top = lr.top + lr.height / 2 - tracksRect.top + tracksEl.scrollTop;
-    node.style.top = `${Math.max(18, top)}px`;
-    node.style.position = 'absolute';
-  });
+  positionSpineNodes();
 }
 
 function getEditorFocusState() {
@@ -1633,12 +2459,7 @@ function bindLineInput(el) {
 
   el.addEventListener('focus', () => {
     isEditorFocused = true;
-    activeLineIndex = idx;
-    focusLineConnections(idx);
-    document.querySelectorAll('.script-line').forEach(row => {
-      row.classList.toggle('active', parseInt(row.dataset.index, 10) === idx);
-    });
-    drawLinkConnections();
+    highlightActiveLine(idx, false);
   });
 
   el.addEventListener('blur', () => {
@@ -1649,6 +2470,15 @@ function bindLineInput(el) {
     if (Number.isNaN(idx) || !parsedLines[idx]) return;
     parsedLines[idx].text = el.value;
     autoResizeInput(el);
+    applyGcValidation(el);
+    const row = el.closest('.script-line');
+    if (row) {
+      const prevLine = parsedLines[idx - 1];
+      const prevType = prevLine ? classifyScriptLine(prevLine.text) : '';
+      const lt = classifyScriptLine(el.value, prevType);
+      row.className = row.className.replace(/\btype-\w+/g, '').trim();
+      row.classList.add(`type-${lt}`);
+    }
     scheduleSyncToBackend();
   });
 
@@ -1694,8 +2524,17 @@ function renderLines(lines, options = {}) {
   pendingFocusIndex = -1;
 
   if (!parsedLines.length) {
-    container.innerHTML = '<div class="placeholder">New ou Import → escreva direto → Link Mode para ligar clipes</div>';
-    document.getElementById('line-count').textContent = '0';
+    container.innerHTML = '<div class="placeholder" role="button" tabindex="0">Escreva o roteiro — clique aqui para começar. Arraste mídias para os nós de sync.</div>';
+    container.querySelector('.placeholder')?.addEventListener('click', () => insertLineLocal(-1, ''));
+    container.querySelector('.placeholder')?.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); insertLineLocal(-1, ''); }
+    });
+    const lc = document.getElementById('line-count');
+    if (lc) lc.textContent = '0 linhas';
+    renderLineGutter();
+    updateFooterProgress();
+    renderMinimap();
+    renderTakeCards();
     return;
   }
 
@@ -1705,42 +2544,22 @@ function renderLines(lines, options = {}) {
     const linked = links.length > 0;
     const clipLinks = links.filter(l => l.link_type === 'clip' && l.start_tc);
     const primary = clipLinks[0] || links[0] || line;
-    let tcColInner;
-    if (clipLinks.length > 1) {
-      tcColInner = clipLinks.map(lk =>
-        `<span class="line-tc has-tc line-tc-display" data-tc="${escapeHtml(lk.start_tc || '')}"` +
-        ` title="${escapeHtml(lk.end_tc || '')}"` +
-        `${lk.link_color ? ` style="color:${lk.link_color}"` : ''}>${escapeHtml(lk.start_tc || '')}</span>`
-      ).join('');
-    } else {
-      const tc = primary.start_tc || line.start_tc || '--:--:--:--';
-      const tcCls = (primary.start_tc || line.start_tc) ? ' has-tc line-tc-display' : '';
-      const tcData = (primary.start_tc || line.start_tc)
-        ? ` data-tc="${escapeHtml(primary.start_tc || line.start_tc)}"` : '';
-      tcColInner = `<span class="line-tc${tcCls}"${tcData} title="${escapeHtml(primary.end_tc || line.end_tc || '')}">${escapeHtml(tc)}</span>`;
-    }
-    if (linked && clipLinks.length === 1) {
-      const clipName = primary.clip_name || primary.track_label || '';
-      const clipColor = primary.link_color || line.link_color || '';
-      if (clipName) {
-        tcColInner += `<span class="line-tc-extra"${clipColor ? ` style="color:${clipColor}"` : ''} title="${escapeHtml(clipName)}">${escapeHtml(truncateLabel(clipName, 16))}</span>`;
-      }
-    }
+    const prevType = index > 0 ? classifyScriptLine(parsedLines[index - 1].text) : '';
+    const lineType = classifyScriptLine(line.text, prevType);
     const active = index === activeLineIndex ? ' active' : '';
     const selected = selectedLines.has(index) ? ' selected' : '';
     const syncedCls = synced ? ' synced' : '';
     const linkedCls = linked ? ' linked' : '';
-    const multiCls = clipLinks.length > 1 ? ' multi-take' : '';
-    const borderColor = (primary.link_color || line.link_color) ? `border-left-color:${primary.link_color || line.link_color}` : '';
-    const textColor = (primary.link_color || line.link_color) ? `color:${primary.link_color || line.link_color}` : '';
+    const highlighted = linked && index === activeLineIndex ? ' highlighted sync-linked' : '';
+    const gcOver = lineType === 'gc' && (line.text || '').trim().length >= GC_MAX_CHARS ? ' gc-over' : '';
     const placeholder = !line.text && index === parsedLines.length - 1 ? 'placeholder="Continue escrevendo..."' : '';
     const note = (line.note || '').trim();
     const noteOpen = openNoteIndex === index;
-    const noteBtnCls = `${note ? ' has-note' : ''}${noteOpen ? ' open' : ''}`;
+    const noteBtnCls = note ? ' has-note' : '';
     const notePanel = noteOpen
       ? `<div class="line-note-panel open">
           <div class="line-note-panel-hdr"><span>Nota · L${index + 1}</span></div>
-          <textarea class="line-note-input" data-index="${index}" placeholder="Comentário do assistente, direção, alt take…">${escapeHtml(note)}</textarea>
+          <textarea class="line-note-input" data-index="${index}" placeholder="Comentário…">${escapeHtml(note)}</textarea>
           <div class="line-note-actions">
             <button type="button" class="note-clear" data-index="${index}">Limpar</button>
             <button type="button" class="note-save" data-index="${index}">Salvar</button>
@@ -1750,25 +2569,40 @@ function renderLines(lines, options = {}) {
     const noteSnippet = note && !noteOpen
       ? `<div class="line-note-snippet" data-index="${index}" title="Editar nota">${escapeHtml(note)}</div>`
       : '';
-    return `<div class="script-line${syncedCls}${linkedCls}${multiCls}${active}${selected}" data-index="${index}" data-tc="${primary.start_tc || line.start_tc || ''}" data-link-id="${primary.link_id || ''}" style="${borderColor}">
-      <span class="line-num-col">${line.line_number || index + 1}</span>
-      <div class="line-tc-col">${tcColInner}</div>
-      <textarea class="line-input" rows="1" data-index="${index}" style="${textColor}" ${placeholder}>${escapeHtml(line.text || '')}</textarea>
-      <div class="line-actions">
-        <button type="button" class="line-icon-btn line-note-btn${noteBtnCls}" data-index="${index}" title="Nota">✎</button>
-        <button type="button" class="line-icon-btn line-jump-btn" data-index="${index}" title="Jump">▶</button>
-        <button type="button" class="line-icon-btn line-del-btn" data-index="${index}" title="Excluir">×</button>
+    return `<div class="script-block" data-index="${index}">
+      ${buildLineTakeSlotHtml(index, line, links)}
+      <div class="script-line type-${lineType}${syncedCls}${linkedCls}${highlighted}${gcOver}${active}${selected}" data-index="${index}" data-tc="${primary.start_tc || line.start_tc || ''}" data-link-id="${primary.link_id || ''}">
+      <div class="script-row"${linked ? ` data-anchor="line-${index}"` : ''}>
+        <textarea class="line-input" rows="1" data-index="${index}" ${placeholder}>${escapeHtml(line.text || '')}</textarea>
+        <div class="line-menu-wrap${noteBtnCls}" data-index="${index}">
+          <button type="button" class="line-menu-btn" data-index="${index}" onclick="toggleLineMenu(${index}, event)" title="Opções" aria-label="Opções">⋮</button>
+          <div class="line-menu-list" role="menu" onclick="event.stopPropagation()">
+            <button type="button" class="line-menu-item${noteBtnCls}" data-action="note" data-index="${index}" role="menuitem">Nota${note ? ' ✓' : ''}</button>
+            ${linked ? `<button type="button" class="line-menu-item" data-action="rename-sync" data-index="${index}" role="menuitem">Renomear sync</button>` : ''}
+            <button type="button" class="line-menu-item" data-action="jump" data-index="${index}" role="menuitem">Jump ▶</button>
+            <button type="button" class="line-menu-item danger" data-action="delete" data-index="${index}" role="menuitem">Excluir</button>
+          </div>
+        </div>
       </div>
       ${noteSnippet}
       ${notePanel}
+    </div>
     </div>`;
   }).join('');
 
   container.querySelectorAll('.line-input').forEach(bindLineInput);
 
+  container.querySelectorAll('.line-take-slot.collapsed').forEach(el => {
+    el.addEventListener('click', e => {
+      e.stopPropagation();
+      const idx = parseInt(el.dataset.lineIndex, 10);
+      if (!Number.isNaN(idx)) highlightActiveLine(idx, true);
+    });
+  });
+
   container.querySelectorAll('.script-line').forEach(el => {
     el.addEventListener('click', e => {
-      if (e.target.classList.contains('line-input') || e.target.closest('.line-actions')
+      if (e.target.classList.contains('line-input') || e.target.closest('.line-menu-wrap')
         || e.target.closest('.line-note-panel')
         || e.target.classList.contains('line-note-snippet')) return;
       const idx = parseInt(el.dataset.index, 10);
@@ -1778,34 +2612,24 @@ function renderLines(lines, options = {}) {
         return;
       }
       focusLineConnections(idx);
+      highlightActiveLine(idx, false);
       drawLinkConnections();
       const inp = el.querySelector('.line-input');
       if (inp) inp.focus();
     });
   });
 
-  container.querySelectorAll('.line-jump-btn').forEach(btn => {
+  container.querySelectorAll('.line-menu-item').forEach(btn => {
     btn.addEventListener('click', e => {
       e.stopPropagation();
       const idx = parseInt(btn.dataset.index, 10);
-      if (backend && !Number.isNaN(idx)) backend.jump_to_line(idx);
-    });
-  });
-
-  container.querySelectorAll('.line-del-btn').forEach(btn => {
-    btn.addEventListener('click', e => {
-      e.stopPropagation();
-      const idx = parseInt(btn.dataset.index, 10);
-      if (!Number.isNaN(idx)) deleteLinesAt(selectedLines.size > 1 ? [...selectedLines] : [idx]);
-    });
-  });
-
-  container.querySelectorAll('.line-note-btn').forEach(btn => {
-    btn.addEventListener('click', e => {
-      e.stopPropagation();
-      const idx = parseInt(btn.dataset.index, 10);
+      const action = btn.dataset.action;
+      closeAllLineMenus();
       if (Number.isNaN(idx)) return;
-      toggleLineNote(idx);
+      if (action === 'jump' && backend) backend.jump_to_line(idx);
+      else if (action === 'rename-sync') startSyncNodeRename(idx);
+      else if (action === 'delete') deleteLinesAt(selectedLines.size > 1 ? [...selectedLines] : [idx]);
+      else if (action === 'note') toggleLineNote(idx);
     });
   });
 
@@ -1845,16 +2669,9 @@ function renderLines(lines, options = {}) {
     ta.addEventListener('click', e => e.stopPropagation());
   });
 
-  container.querySelectorAll('.line-tc.has-tc').forEach(tcEl => {
-    tcEl.addEventListener('dblclick', e => {
-      e.stopPropagation();
-      const row = tcEl.closest('.script-line');
-      const idx = parseInt(row?.dataset.index, 10);
-      if (backend && !Number.isNaN(idx)) backend.jump_to_line(idx);
-    });
-  });
-
-  document.getElementById('line-count').textContent = String(parsedLines.length);
+  document.getElementById('line-count').textContent = `${parsedLines.length} linhas`;
+  renderLineGutter();
+  updateFooterProgress();
 
   const restore = focusIndex >= 0 ? focusIndex : focusState?.index;
   if (restore >= 0) {
@@ -1879,18 +2696,29 @@ function highlightActiveLine(index, scrollIntoView = false) {
     if (index >= 0) {
       document.querySelector(`.script-line[data-index="${index}"]`)?.classList.add('active');
     }
+    document.querySelectorAll('.line-take-slot').forEach(slot => {
+      const idx = parseInt(slot.dataset.lineIndex, 10);
+      const on = index >= 0 && idx === index;
+      slot.classList.toggle('expanded', on);
+      slot.classList.toggle('collapsed', !on);
+    });
     lastActiveLineUi = index;
   }
   activeLineIndex = index;
   lastPlayheadIndex = -1;
+  document.querySelectorAll('.sync-node-v0').forEach(n => {
+    n.classList.toggle('active', index >= 0 && parseInt(n.dataset.lineIndex, 10) === index);
+  });
   updatePlayheadRuler();
+  pairLineWithSpine(index, index >= 0);
   if (!playbackActive) {
     focusLineConnections(index);
     drawLinkConnections();
   }
   if (scrollIntoView && index >= 0 && !playbackActive) {
-    const el = document.querySelector(`.script-line[data-index="${index}"]`);
-    if (el) el.scrollIntoView({ block: 'nearest', behavior: 'auto' });
+    scrollToLine(index, true);
+  } else {
+    scheduleLayoutUpdate();
   }
 }
 
@@ -2045,20 +2873,25 @@ if (typeof QWebChannel !== 'undefined') {
     backend.clips_updated.connect(json => {
       timelineClips = JSON.parse(json);
       renderClips(timelineClips);
+      renderTimelineSpine(true);
       drawLinkConnections();
       scheduleLayoutUpdate();
     });
 
     backend.lines_updated.connect(json => {
       const lines = JSON.parse(json);
+      parsedLines = lines;
+      editingSyncNodeIndex = -1;
       const synced = lines.some(l => l.start_tc || l.link_id || (l.links && l.links.length));
       setSyncBadge(synced);
       renderLines(lines, { preserveFocus: isEditorFocused });
       renderClips(timelineClips);
-      renderSyncRail(true);
+      renderTimelineSpine(true);
+      updateLineSelectionUi();
       if (activeLineIndex >= 0) focusLineConnections(activeLineIndex);
       drawLinkConnections();
       scheduleLayoutUpdate();
+      advanceAfterTapSync();
     });
 
     backend.thumbnail_ready.connect((key, uri) => {
@@ -2069,8 +2902,8 @@ if (typeof QWebChannel !== 'undefined') {
     backend.timeline_info.connect(json => {
       const info = JSON.parse(json);
       document.getElementById('timeline-name').textContent = info.name || '--';
-      document.getElementById('timeline-fps').textContent = info.fps != null ? info.fps : '--';
-      document.getElementById('current-tc').textContent = info.current_timecode || '--:--:--:--';
+      document.getElementById('timeline-fps').textContent = info.fps != null ? `${info.fps} fps` : '-- fps';
+      setTimecodeDisplay(info.current_timecode);
       if (info.duration_tc) {
         document.getElementById('timeline-duration').textContent = info.duration_tc;
       } else if (info.start_frame !== undefined && info.end_frame !== undefined) {
@@ -2078,7 +2911,7 @@ if (typeof QWebChannel !== 'undefined') {
           (info.end_frame - info.start_frame) + ' frames';
       }
       if (info.line_count != null) {
-        document.getElementById('line-count').textContent = info.line_count;
+        document.getElementById('line-count').textContent = `${info.line_count} linhas`;
       }
       if (info.is_synced != null) setSyncBadge(info.is_synced);
       if (info.sync_mode) {
@@ -2098,8 +2931,7 @@ if (typeof QWebChannel !== 'undefined') {
       if (tcUiTimer) return;
       tcUiTimer = setTimeout(() => {
         tcUiTimer = null;
-        const el = document.getElementById('current-tc');
-        if (el) el.textContent = pendingTcDisplay;
+        setTimecodeDisplay(pendingTcDisplay);
         noteTimecodeTick();
       }, 75);
     });
@@ -2112,6 +2944,7 @@ if (typeof QWebChannel !== 'undefined') {
     backend.sync_completed.connect((success, message) => {
       if (success) setSyncBadge(true);
       setStatus(message, success ? '#9ccfd8' : '#eb6f92');
+      setFooterStatus(message || (success ? 'Sincronização concluída' : 'Erro na sincronização'));
     });
 
     backend.js_ready();
@@ -2122,23 +2955,50 @@ if (typeof QWebChannel !== 'undefined') {
 }
 
 const linesEl = document.getElementById('lines-container');
-const tracksEl = document.getElementById('sync-tracks');
+const workspaceBody = document.getElementById('workspace-body');
 const clipsListEl = document.getElementById('clips-list');
-linesEl?.addEventListener('scroll', () => {
-  if (syncingScroll || !tracksEl) return;
+
+function syncEditorScroll(source, scrollTop) {
+  if (syncingScroll) return;
   syncingScroll = true;
-  tracksEl.scrollTop = linesEl.scrollTop;
+  if (workspaceBody && source !== workspaceBody) workspaceBody.scrollTop = scrollTop;
   syncingScroll = false;
   scheduleScrollSync();
-}, { passive: true });
-tracksEl?.addEventListener('scroll', () => {
-  if (syncingScroll || !linesEl) return;
-  syncingScroll = true;
-  linesEl.scrollTop = tracksEl.scrollTop;
-  syncingScroll = false;
-  scheduleScrollSync();
+}
+
+workspaceBody?.addEventListener('scroll', () => {
+  if (syncingScroll || !workspaceBody) return;
+  updateMinimapViewport();
+  computeWorkspacePaths();
+  positionSpineNodes();
 }, { passive: true });
 clipsListEl?.addEventListener('scroll', () => scheduleScrollSync(), { passive: true });
+document.getElementById('script-minimap')?.addEventListener('click', e => {
+  const body = document.getElementById('workspace-body');
+  const ticks = document.getElementById('minimap-ticks');
+  if (!body || !ticks) return;
+  const rect = ticks.getBoundingClientRect();
+  const y = e.clientY - rect.top;
+  const ratio = y / Math.max(ticks.offsetHeight, 1);
+  body.scrollTop = ratio * body.scrollHeight;
+  updateMinimapViewport();
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'F3') {
+    e.preventDefault();
+    syncTimeline();
+    closeAllMenus();
+  }
+  if (e.key === 'F5') {
+    e.preventDefault();
+    linkToPlayhead();
+  }
+  if (e.key === 'F2' && activeLineIndex >= 0 && lineIsLinked(parsedLines[activeLineIndex])) {
+    e.preventDefault();
+    startSyncNodeRename(activeLineIndex);
+  }
+  if (playbackActive) onTapSyncKey(e);
+});
 window.addEventListener('resize', () => {
   clearTimeout(resizeEndTimer);
   resizeEndTimer = setTimeout(() => scheduleLayoutUpdate(), 200);
@@ -2146,6 +3006,23 @@ window.addEventListener('resize', () => {
 document.getElementById('intro-overlay')?.addEventListener('click', e => {
   if (e.target.id === 'intro-overlay') closeIntro();
 });
+function initWorkspaceObservers() {
+  const body = document.getElementById('workspace-body');
+  const lines = document.getElementById('lines-container');
+  if (body && body.dataset.roBound !== '1') {
+    body.dataset.roBound = '1';
+    new ResizeObserver(() => scheduleLayoutUpdate()).observe(body);
+  }
+  if (lines && lines.dataset.roBound !== '1') {
+    lines.dataset.roBound = '1';
+    new MutationObserver(() => scheduleLayoutUpdate()).observe(lines, { childList: true, subtree: true });
+  }
+}
+
+loadPanelState();
+initMediaPoolDragDrop();
+initClipListInteractions();
+initWorkspaceObservers();
 renderIntroContent();
 </script>
 </body>

@@ -95,6 +95,10 @@ python install.py
 4. Abra um **projeto** com **timeline** na página **Edit**
 5. Menu: **Workspace → Scripts → SScriptSync_v1**
 
+> **Não use o modo standalone para decupagem.**  
+> Comandos como `python %LOCALAPPDATA%\SScriptSync_v1\main.py` ou atalhos que abrem só a janela PySide6 **não** ligam ao Resolve.  
+> O status ficará "Connecting…" / sem clipes. Sempre inicie pelo menu **Scripts** acima.
+
 ---
 
 ## Verificar instalação
@@ -129,6 +133,12 @@ Depois rode `install.bat` novamente.
 ### Resolve Free (sem Studio)
 
 Use **Fusion → Scripts → Comp → SScriptSync_v1_Free** — sync de timeline limitado.
+
+### Abriu standalone (não conecta)
+
+**Sintoma:** Janela abre, "Connecting…", sem clipes/timeline.  
+**Causa:** App lançado via `python main.py` fora do Resolve.  
+**Fix:** Feche, abra o Resolve com projeto+timeline, use **Workspace → Scripts → SScriptSync_v1**. Rode `install.bat` se o script não aparecer no menu.
 
 ---
 

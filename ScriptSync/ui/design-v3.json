@@ -1,0 +1,154 @@
+{
+  "app": {
+    "name": "SCRIPT+SYNC",
+    "version": "v3.0",
+    "toolbar": {
+      "actions": [
+        { "name": "Auto Sync", "shortcut": "F3", "icon": "sync" },
+        { "name": "Scenes", "icon": "list" },
+        { "name": "Import", "icon": "download" },
+        { "name": "Export", "icon": "upload" }
+      ]
+    }
+  },
+  "workspace": {
+    "panels": {
+      "media_library": {
+        "title": "Mídias",
+        "items": [
+          {
+            "scene": "CENA 04",
+            "has_video": true,
+            "has_audio": true,
+            "timecode_in": "10:04:12:00",
+            "timecode_out": "10:04:45:00"
+          },
+          {
+            "scene": "CENA 04",
+            "has_video": true,
+            "has_audio": true,
+            "timecode_in": "10:04:12:00",
+            "timecode_out": "10:04:25:00"
+          },
+          {
+            "scene": "CENA 04",
+            "has_video": true,
+            "has_audio": true,
+            "timecode_in": "10:05:12:00",
+            "timecode_out": "10:04:25:00"
+          },
+          {
+            "scene": "CENA 04",
+            "has_video": true,
+            "has_audio": true,
+            "timecode_in": "10:06:45:00",
+            "timecode_out": "10:06:25:00"
+          },
+          {
+            "scene": "CENA 04",
+            "has_video": true,
+            "has_audio": true,
+            "timecode_in": "10:06:25:00",
+            "timecode_out": "10:06:25:00"
+          },
+          {
+            "scene": "CENA 04",
+            "has_video": true,
+            "has_audio": true,
+            "timecode_in": "10:06:37:00",
+            "timecode_out": "10:06:45:00"
+          }
+        ]
+      },
+      "synchronization": {
+        "title": "Sincronização",
+        "nodes": [
+          {
+            "type": "Câm A",
+            "color": "yellow",
+            "connected_take": {
+              "id": "TAKE 4A-3",
+              "duration": "30 mins",
+              "details": "fps fps · duratão"
+            }
+          },
+          {
+            "type": "Câm B",
+            "color": "blue",
+            "connected_take": {
+              "id": "TAKE 4B-1",
+              "duration": "24 mins",
+              "details": "1320 fps · duratão · 13 min"
+            }
+          },
+          {
+            "type": "Áudio",
+            "color": "green",
+            "connected_take": null
+          }
+        ],
+        "active_link": {
+          "source_node": "Áudio",
+          "target_script_line": "ANA: Com certeza..."
+        },
+        "bottom_takes": [
+            {
+              "node": "Câm B",
+              "color": "blue",
+              "id": "TAKE 4A-3",
+              "duration": "30 mins",
+              "details": "120 fps · fps · duration: 24 m"
+            },
+            {
+              "node": "Áudio",
+              "color": "green",
+              "id": "TAKE 4B-1",
+              "duration": "30 mins",
+              "details": "1:0 fps · fps · duration: 22 m"
+            }
+        ]
+      },
+      "script_editor": {
+        "title": "Roteiro",
+        "content": [
+          { "type": "scene_heading", "text": "CENA 04 - EXTERIOR - RUA NOITE (00:04:12)" },
+          { "type": "action", "text": "MATEUS e ANA caminham a originndas sos cameios perial as contenções de portetos." },
+          { "type": "action", "text": "CHARATETE - ENERAIIOR" },
+          { "type": "action", "text": "Scenes o minno actual fiction." },
+          { "type": "character", "text": "MATEUS:" },
+          { "type": "dialogue", "text": "Você acha que ele viu?" },
+          { "type": "character", "text": "ANA:" },
+          { "type": "dialogue", "text": "Com certeza. (olhando para trás)\nMas ele não vai fazer nada.", "highlighted": true, "sync_status": "linked" },
+          { "type": "action", "text": "CHARACTER" },
+          { "type": "action", "text": "Conqusem para n-s seu futuro." },
+          { "type": "action", "text": "DIALOGUE:\nNo se soviandou ales de pros o hoterno de fotion." }
+        ],
+        "minimap_visible": true
+      },
+      "video_player": {
+        "title": "Vídeo",
+        "current_timecode": "00:04:15:02",
+        "controls": ["J", "K", "L"]
+      }
+    }
+  },
+  "footer": {
+    "left_actions": [
+      { "label": "Sincronizar Manualmente", "shortcut": "F5" },
+      { "label": "Próxima Cena" }
+    ],
+    "status_console": {
+      "message": "Sincronização fonética concluída para Cena 04"
+    },
+    "right_actions": {
+      "progress": {
+        "value": 35,
+        "unit": "%"
+      },
+      "buttons": [
+        { "label": "Avançar Script" },
+        { "label": "Finalizar Decupagem", "style": "primary" }
+      ]
+    }
+  }
+}

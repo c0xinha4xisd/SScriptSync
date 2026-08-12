@@ -6,6 +6,33 @@ Format based on [Keep a Changelog](https://keepachangelog.com/).
 
 ---
 
+## [1.2.0] — 2026-08-12 — UI v3 (v0 design)
+
+**Powered by [JhonnyMarajo](https://github.com/JhonnyMarajo) (Jhonatam Martins)**
+
+Redesign completo da interface (export v0.app), spine inline e take cards na ordem do roteiro.
+
+### Added
+
+- UI v3: top bar, painel mídias, workspace spine+roteiro+minimap, footer decupagem
+- `ui/v0-theme.css`, `ui/reference-v0/` (referência visual)
+- Nós sync com **nome do clip** + renomear (`link_label`, duplo-clique / F2)
+- Take cards **inline** por linha (expande só linha ativa)
+- Busca roteiro (Ctrl+F) e busca mídias no painel
+- `backend.set_sync_node_label()` para labels customizados
+
+### Fixed
+
+- Link Mode sem re-render completo (glitch ao ligar clip)
+- Spine alinhada à linha (sem MIN_GAP artificial)
+- Scroll, drag-drop e highlights para layout v0
+
+### Docs
+
+- README/INSTALL: aviso **standalone vs Resolve Scripts** (GitHub clone)
+
+---
+
 ## [1.1.0] — 2026-08-12 — Skeleton backup
 
 **Powered by [JhonnyMarajo](https://github.com/JhonnyMarajo) (Jhonatam Martins)**

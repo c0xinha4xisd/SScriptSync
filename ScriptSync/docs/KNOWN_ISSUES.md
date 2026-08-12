@@ -30,7 +30,8 @@ Ver [RESOLVE_STUDIO_21_API.md](RESOLVE_STUDIO_21_API.md).
 
 | Item | Estado |
 |------|--------|
-| Linhas SVG só no highlight | Intencional (performance) — clique na linha ou Link Mode |
+| Standalone (`python main.py`) | Não conecta ao Resolve — usar **Workspace → Scripts → SScriptSync_v1** |
+| Linhas SVG só no highlight | Intencional — clique na linha ou Link Mode |
 | Scene / Page nav | Só detecta cabeçalhos INT./EXT. no roteiro |
 | Thumbnails | Best-effort; podem falhar em clipes sem mídia local |
 

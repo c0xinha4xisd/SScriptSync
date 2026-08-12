@@ -104,11 +104,12 @@ If needed, you can further use the `web_scraper.py` file to scrape the web page 
 
 # Scratchpad
 
-## SScriptSync v1.1 — Rename + Fases 3–4 (Aug 2026)
-
-[X] Fase 3: clipes V1, sync by clips, inline edit, sync mode UI
-[X] Fase 4: sync_store JSON persistência + auto-load
-[X] docs/RESOLVE_STUDIO_21_API.md
-[X] docs/TESTING.md
-[X] README atualizado (híbrido PySide6)
-[ ] Primeiro teste pelo usuário no Resolve Studio 21
+## Task: design-v3.json spec (Aug 2026)
+[X] Copiar ui/design-v3.json como referência
+[X] Toolbar: Auto Sync F3, Scenes, Import, Export (+ ⋯ mais)
+[X] Mídias: scene + ícones V/A + TC in/out
+[X] Spine: take cards (id, duration, details) + bottom_takes
+[X] Roteiro: painel titulado, Courier, só ⋮ (menu oculto)
+[X] Vídeo: só J/K/L + TC
+[X] Footer: labels exatos do JSON
+[ ] User validar vs mockup

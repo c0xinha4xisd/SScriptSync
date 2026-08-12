@@ -3,20 +3,22 @@
 Editor de texto interativo sincronizado com a timeline do **DaVinci Resolve Studio**, inspirado no fluxo **AVID ScriptSync**.
 
 **Autor:** [Jhonatam Martins (JhonnyMarajo)](https://github.com/JhonnyMarajo)  
-**Versão:** 1.1.0 (skeleton) | **Resolve alvo:** Studio 21  
-**Repositório:** backup GitHub antes da grande atualização v2
+**Versão:** 1.2.0 (UI v3) | **Resolve alvo:** Studio 21  
+**Repositório:** [github.com/c0xinha4xisd/SScriptSync](https://github.com/c0xinha4xisd/SScriptSync)
 
 ---
 
-## Funcionalidades (skeleton v1.1.0)
+## Funcionalidades (v1.2.0 — UI v3)
 
 | Área | O que funciona |
 |------|----------------|
+| **UI v3** | Layout v0 (spine + roteiro + mídias + minimap), tema `v0-theme.css` |
+| **Spine Sync** | Nó por linha com **nome do clip**, renomear (duplo-clique / F2 / menu) |
+| **Take cards** | Inline na ordem do roteiro; expande só a linha ativa |
 | **Editor** | Escrever do zero, import TXT/SRT/CSV, edição inline, notas |
-| **Link Mode** | Selecionar linhas → clicar clip (V ou A) → timecodes + cor |
-| **Visual** | Curva SVG clipe→linha, coluna SYNC, highlight |
-| **Sync** | Auto Linear / By Clips, range, filtros CAPS/()/(cena) |
-| **Navegação** | Jump linha/clip/TC, focus clip (marks + playhead) |
+| **Link Mode** | Selecionar linhas → clicar/arrastar clip → timecodes + cor |
+| **Sync** | F3 auto-sync, F5 manual, range, filtros CAPS/()/(cena) |
+| **Navegação** | Jump linha/clip/TC, cenas, busca (Ctrl+F) |
 | **Persistência** | Sidecar `.ssync.json`, sessão por projeto/timeline |
 | **Export** | TXT + sidecar + EDL |
 
@@ -53,6 +55,10 @@ No Resolve Studio 21:
 ```
 Workspace → Scripts → SScriptSync_v1
 ```
+
+> **Importante:** Abra **sempre pelo menu Scripts do Resolve** (com projeto + timeline abertos).  
+> Rodar `python main.py` direto abre o app em **modo standalone** — a UI abre, mas **não conecta** ao Resolve (sem QWebChannel/API).  
+> Depois de clonar do GitHub, rode `install.bat` ou `python install.py` e use o launcher no Resolve.
 
 **Resolve:** Preferences → System → General → **External scripting using = Local**
 
@@ -114,8 +120,10 @@ ScriptSync/
 ├── install.py           # Deploy local
 ├── core/                # Lógica + Resolve API
 ├── ui/
-│   ├── app.html         # UI completa
-│   └── backend.py       # Bridge Python ↔ JS
+│   ├── app.html         # UI completa (v3 / v0 layout)
+│   ├── v0-theme.css     # Tema visual v3
+│   ├── backend.py       # Bridge Python ↔ JS
+│   └── reference-v0/    # Export v0.app (referência visual)
 ├── scripts/             # Launchers Resolve
 └── docs/
 ```
