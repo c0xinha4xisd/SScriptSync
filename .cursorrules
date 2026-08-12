@@ -114,7 +114,7 @@ If needed, you can further use the `web_scraper.py` file to scrape the web page 
 [X] Remove legacy Electron + resolve_async
 [X] Docs: ARCHITECTURE, CHANGELOG, KNOWN_ISSUES, LICENSE, README
 [X] Git init + commit
-[ ] User: create repo github.com/JhonnyMarajo/SScriptSync + push
+[X] Push: https://github.com/c0xinha4xisd/SScriptSync (branch main)
 
 ## Deferred
 - Resolve sync during playback (KNOWN_ISSUES.md)

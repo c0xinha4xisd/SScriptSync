@@ -2,7 +2,9 @@
 
 **Script-synced text editor for DaVinci Resolve Studio** — AVID ScriptSync-style workflow.
 
-**Powered by [JhonnyMarajo](https://github.com/JhonnyMarajo) — Jhonatam Martins**
+**Powered by [Jhonatam Martins (JhonnyMarajo)](https://github.com/JhonnyMarajo)**
+
+**Repositório:** [github.com/c0xinha4xisd/SScriptSync](https://github.com/c0xinha4xisd/SScriptSync)
 
 ---
 
